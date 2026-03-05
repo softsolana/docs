@@ -1,9 +1,9 @@
 ---
 title: "Publish option"
-description: "Create a new prediction market with named outcomes and a fee rate."
+description: "Create a new outcome market with named outcomes and a fee rate."
 ---
 
-`publish_option` creates a `Market` account that defines a prediction market. Once published, users can trade outcome shares on it via [`swap`](/contracts/predict/swap).
+`publish_option` creates a `Market` account that defines an outcome market. Once published, users can trade outcome shares on it via [`swap`](/contracts/predict/swap).
 
 Outcome `0` — **Inconclusive** — is always prepended by the contract. The outcomes you supply start at index `1`.
 
@@ -14,7 +14,7 @@ Outcome `0` — **Inconclusive** — is always prepended by the contract. The ou
 </ParamField>
 
 <ParamField body="ancillary_data" type="string" required>
-  Human-readable description or metadata for the market — the question being predicted, resolution criteria, data sources, etc. Max 200 characters.
+  Human-readable description or metadata for the market — the question being predicted. Max 200 characters.
 </ParamField>
 
 <ParamField body="fees" type="u64" required>

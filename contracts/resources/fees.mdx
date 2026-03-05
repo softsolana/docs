@@ -3,7 +3,7 @@ title: "Fees"
 description: "Protocol fees collected at bet placement."
 ---
 
-A protocol fee is deducted from every bet's `amount` at placement. The fee rate depends on the operator signing the [`placement`](/contracts/pam/place) transaction.
+A protocol fee is deducted from every bet's `amount` at placement. The fee rate depends on the operator signing the [`placement`](/contracts/pam/place) transaction. 
 
 ## Fee schedule
 
@@ -11,13 +11,3 @@ A protocol fee is deducted from every bet's `amount` at placement. The fee rate 
 |---|---|
 | SoftSol Predict | 25 bps (0.25%) |
 | Third-party | 10 bps (0.10%) |
-
-## How fees work
-
-Fees are handled transparently — users do not experience any reduction in their bet amount or payout potential. The escrow is funded as follows:
-
-```
-escrow = amount + max_win
-```
-
-The protocol fee is taken from within `amount` and routed to the yield vault for stakers. This happens in the background and does not affect the user-facing bet size or potential winnings. Stakers collect accumulated rewards at any time via [`claim`](/contracts/pam/claim) or when they [`unstake`](/contracts/pam/unstake).

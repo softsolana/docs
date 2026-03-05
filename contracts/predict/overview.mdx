@@ -14,10 +14,8 @@ Predict lets you launch outcome markets on any event — sports, politics, finan
 
 Each market has a set of outcomes. Users buy shares in the outcome they believe will occur. Share prices reflect the market's implied probability of each outcome. If the outcome a user holds wins, their shares redeem 1:1 for USDC.
 
-**Outcome 0 — Inconclusive** — always prepended automatically by the contract. It cannot be traded but can be declared as the result if the event is void.
-
 ## Flow
 
-1. [`publish_option`](/contracts/predict/publish-option) — an operator creates a prediction market with named outcomes and a fee rate.
+1. [`publish_option`](/contracts/predict/publish-option) — an operator creates a outcome market with named outcomes and a margin rate.
 2. [`get_quote`](/contracts/predict/get-quote) — simulate a buy or sell to preview shares, price, fees, and probability impact before submitting.
 3. [`swap`](/contracts/predict/swap) — buy outcome shares with USDC or sell shares back for USDC.
