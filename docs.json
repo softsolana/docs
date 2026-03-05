@@ -16,7 +16,8 @@
           {
             "group": "PAM",
             "pages": [
-              "contracts/pam/overview"
+              "contracts/pam/overview",
+              "contracts/pam/addresses"
             ]
           },
           {
