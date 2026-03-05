@@ -1,0 +1,32 @@
+---
+title: "Receive entropy"
+description: "Pull Pyth randomness into a pending bet once the Fortuna keeper has fulfilled the request."
+---
+
+`receive_entropy` is called after [`place`](/contracts/pam/place) with `verifiable = true`. Once the Pyth Fortuna keeper reveals its randomness, anyone — the keeper, the operator, or a relayer — can call this instruction to write the `vrf_seed` into the bet.
+
+Settlement is blocked until `receive_entropy` has run successfully.
+
+## When to call
+
+After `place`, poll or subscribe to the Pyth Entropy `entropy_request` account. When `is_fulfilled` (byte offset 177) becomes `true`, the request is ready. Call `receive_entropy` with the bet account and the request account.
+
+The instruction verifies that:
+
+- The Pyth keeper has fulfilled the request.
+- The request's sequence number and provider match what was stored at placement.
+- The requester recorded in the Pyth request matches the bet's escrow key.
+
+## Accounts
+
+| Account | Writable | Description |
+|---|:---:|---|
+| `bet` | ✓ | The `Bet` PDA to update with the revealed `vrf_seed`. |
+| `entropy_request` | | The Pyth Entropy request account. Must be owned by the Pyth Entropy program and match the sequence and provider stored on the bet. |
+
+## Errors
+
+| Error | Cause |
+|---|---|
+| `EntropyNotReady` | The Pyth keeper has not yet fulfilled the request, or `receive_entropy` has already run for this bet. |
+| `Unauthorized` | The request's sequence number, provider, or requester does not match what was recorded at placement. |

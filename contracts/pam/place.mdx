@@ -1,0 +1,122 @@
+---
+title: "Place"
+description: "Create a new bet and lock collateral into escrow."
+---
+
+`place` creates a `Bet` account, transfers `amount` USDC from the user into escrow, and locks `max_win` from the active treasury alongside it. This guarantees the maximum payout is available before settlement occurs.
+
+A protocol fee is deducted from `amount` at placement. The remainder (`net_stake`) is the base for all payout calculations. The fee is immediately routed to the yield vault for stakers.
+
+## Parameters
+
+<ParamField body="amount" type="u64" required>
+  Bet size in USDC base units (1 USDC = 1,000,000). Transferred in full from the user; the protocol fee is deducted internally before escrow is funded.
+</ParamField>
+
+<ParamField body="max_win" type="u64" required>
+  Maximum amount, in USDC base units, that the user can win above their `net_stake`. The active treasury must hold at least this amount. Set to at least `(max_payout_bps / 10_000 − 1) × net_stake`.
+</ParamField>
+
+<ParamField body="seed" type="u64" required>
+  Unique identifier for this bet scoped to the (platform, user) pair. Used to derive the bet and escrow PDAs. Do not reuse a seed while a bet with that seed is still open.
+</ParamField>
+
+<ParamField body="resolvers" type="Pubkey[]" required>
+  Up to 8 public keys authorised to attest outcomes for this bet. At least `threshold` of these must sign the settlement message.
+</ParamField>
+
+<ParamField body="threshold" type="u8" required>
+  Minimum number of resolver signatures required for settlement. Must satisfy `1 ≤ threshold ≤ resolvers.length`.
+</ParamField>
+
+<ParamField body="outcome_slots" type="string[]" required>
+  Named variables resolvers will attest. The order defines the index used in the payout matrix and in `settle`'s `resolved_outcomes`. Examples: `["home_score", "away_score"]` or `["bucket"]`.
+</ParamField>
+
+<ParamField body="payout_matrix" type="PayoutRow[]" required>
+  Ordered list of payout rules. See [payout matrix](#payout-matrix) below.
+</ParamField>
+
+<ParamField body="verifiable" type="bool" required>
+  - `true` — requests on-chain randomness from Pyth Fortuna. [`receive_entropy`](/contracts/pam/receive-entropy) must be called before [`settle`](/contracts/pam/settle). Use for random-outcome games (Plinko, coin flip, etc.).
+  - `false` — the VRF seed is derived locally using SHA-256. `settle` can be called immediately after placement. Use for observed-outcome bets (sports, prediction markets).
+</ParamField>
+
+## Payout matrix
+
+A `PayoutRow` describes a win condition and its payout. Rows are evaluated top-to-bottom; the first matching row determines the payout. If no row matches, the user receives nothing.
+
+```typescript
+type PayoutRow = {
+  conditions: Condition[];    // all conditions ANDed; empty array = always matches
+  payout_bps: number | null;  // basis points of net_stake; null = push (return stake)
+};
+
+type Condition = {
+  o1: number;           // index into outcome_slots (left-hand side)
+  o2: number | null;    // if set, rhs = resolved_outcomes[o2] (slot vs slot)
+  op: "Gt" | "Gte" | "Lt" | "Lte" | "Eq" | "Neq";
+  value: number;        // literal rhs, scaled ×1,000,000; ignored when o2 is set
+};
+```
+
+`payout_bps` is a percentage of `net_stake` in basis points:
+
+- `10_000` bps = 100% → stake returned (break even)
+- `20_000` bps = 200% → stake doubled
+- `null` → push — stake returned regardless of outcome
+
+<Note>
+All outcome values — both the resolver-attested `resolved_outcomes` in `settle` and the literal `value` in conditions — are scaled by 1,000,000. A score of 3 is represented as `3_000_000`.
+</Note>
+
+### Example: soccer match
+
+```typescript
+// outcome_slots: ["home_score", "away_score"]
+const payoutMatrix = [
+  // Home win: home_score > away_score → 190% of stake returned
+  {
+    conditions: [{ o1: 0, o2: 1, op: "Gt", value: 0 }],
+    payout_bps: 19_000,
+  },
+  // Draw: home_score == away_score → stake returned
+  {
+    conditions: [{ o1: 0, o2: 1, op: "Eq", value: 0 }],
+    payout_bps: null,
+  },
+  // Away win (fallback, empty conditions always match) → loss
+  {
+    conditions: [],
+    payout_bps: 0,
+  },
+];
+```
+
+<Note>
+Slot-vs-slot comparisons (e.g. `home_score > away_score`) use `o2`. Set `value` to `0` when `o2` is provided — it is ignored.
+
+Literal comparisons (e.g. home team scored more than 2 goals) use `value` scaled by 1,000,000: `{ o1: 0, o2: null, op: "Gt", value: 2_000_000 }`.
+</Note>
+
+## Accounts
+
+| Account | Writable | Description |
+|---|:---:|---|
+| `operator` | | Authorised operator key. Determines the protocol fee rate. |
+| `platform` | | Platform wallet. Used to derive the active treasury PDA. |
+| `user` | ✓ | Bet placer. Pays `amount` USDC and rent for new PDAs. |
+| `bet_escrow` | ✓ | PDA token account. Holds `net_stake + max_win` until settlement. |
+| `bet` | ✓ | PDA storing the bet descriptor. Closed and rent returned at settlement. |
+| `usdc_mint` | | USDC mint. |
+| `user_account` | ✓ | User's USDC associated token account. |
+| `active_treasury` | ✓ | Platform treasury PDA. Must hold at least `max_win`. |
+| `yield_vault` | ✓ | Protocol vault. Receives the protocol fee. |
+| `yield_state` | ✓ | Global staking state. |
+| `entropy` | | _(verifiable only)_ Pyth Entropy program. |
+| `entropy_config` | ✓ | _(verifiable only)_ Pyth global entropy state. |
+| `entropy_provider` | ✓ | _(verifiable only)_ Pyth Fortuna provider. |
+| `entropy_request` | ✓ | _(verifiable only)_ New Pyth request PDA. |
+| `system_program` | | |
+| `token_program` | | |
+| `associated_token_program` | | |

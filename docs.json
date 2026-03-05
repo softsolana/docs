@@ -11,6 +11,33 @@
   "navigation": {
     "tabs": [
       {
+        "tab": "Smart contracts",
+        "groups": [
+          {
+            "group": "PAM",
+            "pages": [
+              "contracts/pam/overview"
+            ]
+          },
+          {
+            "group": "Betting",
+            "pages": [
+              "contracts/pam/place",
+              "contracts/pam/receive-entropy",
+              "contracts/pam/settle"
+            ]
+          },
+          {
+            "group": "Staking",
+            "pages": [
+              "contracts/pam/stake",
+              "contracts/pam/claim",
+              "contracts/pam/unstake"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Guides",
         "groups": [
           {
@@ -76,9 +103,9 @@
           "icon": "book-open-cover"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Discord",
+          "href": "https://discord.gg/placeholder",
+          "icon": "discord"
         }
       ]
     }
@@ -91,7 +118,7 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:hi@softsol.xyz"
       }
     ],
     "primary": {

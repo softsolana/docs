@@ -1,0 +1,80 @@
+---
+title: "Settle"
+description: "Resolve a bet and pay out based on the payout matrix."
+---
+
+`settle` evaluates `resolved_outcomes` against the bet's payout matrix, verifies that enough resolvers have signed the outcome, and transfers funds to the user. The bet and escrow accounts are closed at the end and rent is returned to the user.
+
+## Requirements
+
+Before calling `settle`:
+
+- For verifiable bets, [`receive_entropy`](/contracts/pam/receive-entropy) must have run successfully.
+- The transaction must include at least `threshold` **Ed25519 native-program pre-instructions**, each signed by a distinct key from the bet's `resolvers` list, all signing the same message (see below).
+
+## Resolver attestation
+
+Each resolver signs a 32-byte SHA-256 hash and submits it as an Ed25519 native-program instruction in the same transaction, before the `settle` instruction.
+
+```
+message = SHA-256(
+  bet_account_key         ||  // 32 bytes — the bet PDA public key
+  seed_le                 ||  // 8 bytes  — seed as little-endian u64
+  vrf_seed                ||  // 32 bytes — the bet's vrf_seed
+  borsh(resolved_outcomes)||  // 4-byte LE length prefix + 8-byte LE i64 per element
+  "ss_settle_v1"              // ASCII domain separator
+)
+```
+
+<Note>
+`borsh(resolved_outcomes)` is a standard Borsh-encoded `Vec<i64>`: a 4-byte little-endian length prefix followed by each value as an 8-byte little-endian i64.
+
+Use the **bet account PDA key** (not `bet.id`, which is the escrow key) as `bet_account_key`.
+</Note>
+
+```typescript
+import { sha256 } from "@noble/hashes/sha256";
+import { serialize } from "borsh";
+
+const message = sha256(Buffer.concat([
+  betAccountPubkey.toBuffer(),          // 32 bytes
+  seedToLE(seed),                       // 8 bytes (Buffer.from(new BN(seed).toArrayLike(Buffer, "le", 8)))
+  bet.vrfSeed,                          // 32 bytes
+  borshSerializeI64Vec(resolvedOutcomes),
+  Buffer.from("ss_settle_v1"),
+]));
+```
+
+## Parameters
+
+<ParamField body="seed" type="u64" required>
+  The same seed used when the bet was placed. Used to derive the bet and escrow PDAs.
+</ParamField>
+
+<ParamField body="resolved_outcomes" type="i64[]" required>
+  Attested values for each outcome slot, in the same order as `outcome_slots`. All values are scaled by 1,000,000 — a score of 3 is `3_000_000`. Must have the same length as `outcome_slots`.
+</ParamField>
+
+## Accounts
+
+| Account | Writable | Description |
+|---|:---:|---|
+| `operator` | | Authorised operator key. |
+| `platform` | | Platform wallet. |
+| `user` | ✓ | The original bet placer. Receives payout and reclaimed rent. |
+| `bet_escrow` | ✓ | Escrow PDA. Closed at settlement. |
+| `bet` | ✓ | Bet descriptor PDA. Closed at settlement; rent returned to user. |
+| `usdc_mint` | | USDC mint. |
+| `user_account` | ✓ | User's USDC associated token account. Receives the payout. |
+| `active_treasury` | ✓ | Platform treasury. Receives any unspent escrow funds. |
+| `instructions_sysvar` | | Solana instructions sysvar. Used to read Ed25519 pre-instructions. |
+| `system_program` | | |
+| `token_program` | | |
+| `associated_token_program` | | |
+
+## Errors
+
+| Error | Cause |
+|---|---|
+| `EntropyNotReady` | `receive_entropy` has not run yet (verifiable bets only). |
+| `ResolverVerificationFailed` | Fewer than `threshold` valid resolver signatures found, or a signature does not match the expected message. |

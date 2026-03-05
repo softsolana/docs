@@ -1,0 +1,27 @@
+---
+title: "Claim"
+description: "Withdraw accumulated USDC rewards without unstaking."
+---
+
+`claim` transfers all accumulated USDC rewards to the user's USDC token account. Your staked token balance is unchanged.
+
+Rewards accrue from the protocol fee on every placed bet, distributed pro-rata based on your share of total stake. You can call `claim` as often as you like; there is no lock-up period.
+
+## Accounts
+
+| Account | Writable | Description |
+|---|:---:|---|
+| `user` | ✓ | The staker claiming rewards. |
+| `stake_account` | ✓ | PDA tracking this user's staked balance and accrued rewards. |
+| `yield_state` | | Global staking state. |
+| `yield_vault` | ✓ | Protocol vault holding accumulated fee rewards. |
+| `usdc_mint` | | USDC mint. |
+| `user_usdc` | ✓ | User's USDC associated token account. Receives the claimed rewards. |
+| `token_program` | | |
+| `associated_token_program` | | |
+
+## Errors
+
+| Error | Cause |
+|---|---|
+| `InvalidAmount` | There are no rewards to claim. |

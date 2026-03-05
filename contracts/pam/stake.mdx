@@ -1,0 +1,28 @@
+---
+title: "Stake"
+description: "Deposit tokens to earn a share of protocol fees."
+---
+
+`stake` deposits tokens into the stake vault. Stakers earn USDC rewards from the protocol fee collected on every placed bet. Rewards accrue continuously and can be collected at any time with [`claim`](/contracts/pam/claim), or automatically when you [`unstake`](/contracts/pam/unstake).
+
+If you already have an open stake, any pending rewards are settled internally before the new amount is added.
+
+## Parameters
+
+<ParamField body="amount" type="u64" required>
+  Amount to stake in token base units. Must be greater than zero.
+</ParamField>
+
+## Accounts
+
+| Account | Writable | Description |
+|---|:---:|---|
+| `user` | ✓ | The staker. Pays the token transfer and rent for a new stake account on first stake. |
+| `stake_account` | ✓ | PDA tracking this user's staked balance and accrued rewards. Created on first stake. |
+| `yield_state` | ✓ | Global staking state. |
+| `mint` | | Token mint being staked. |
+| `user_token_account` | ✓ | User's token associated token account. |
+| `stake_vault` | ✓ | Protocol vault holding all staked tokens. |
+| `system_program` | | |
+| `token_program` | | |
+| `associated_token_program` | | |

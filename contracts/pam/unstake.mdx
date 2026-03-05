@@ -1,0 +1,35 @@
+---
+title: "Unstake"
+description: "Withdraw staked tokens and claim all accumulated rewards."
+---
+
+`unstake` returns `amount` tokens to the user and simultaneously pays out all accumulated USDC rewards. You do not need to call [`claim`](/contracts/pam/claim) separately before unstaking — rewards are always settled as part of the withdrawal.
+
+## Parameters
+
+<ParamField body="amount" type="u64" required>
+  Amount to withdraw in token base units. Must be greater than zero and no more than your current staked balance.
+</ParamField>
+
+## Accounts
+
+| Account | Writable | Description |
+|---|:---:|---|
+| `user` | ✓ | The staker. |
+| `stake_account` | ✓ | PDA tracking this user's staked balance and accrued rewards. |
+| `yield_state` | ✓ | Global staking state. |
+| `mint` | | Token mint being unstaked. |
+| `user_token_account` | ✓ | User's token associated token account. Receives the withdrawn tokens. |
+| `stake_vault` | ✓ | Protocol vault holding all staked tokens. |
+| `yield_vault` | ✓ | Protocol vault holding accumulated fee rewards. |
+| `usdc_mint` | | USDC mint. |
+| `user_usdc` | ✓ | User's USDC associated token account. Receives the claimed rewards. |
+| `system_program` | | |
+| `token_program` | | |
+| `associated_token_program` | | |
+
+## Errors
+
+| Error | Cause |
+|---|---|
+| `InsufficientBalance` | `amount` exceeds your current staked balance. |
