@@ -60,11 +60,14 @@ type Condition = {
 };
 ```
 
-`payout_bps` is a percentage of `net_stake` in basis points:
+`payout_bps` is a multiplier on `net_stake` in basis points:
 
 - `10_000` bps = 100% → stake returned (break even)
-- `20_000` bps = 200% → stake doubled
+- `20_000` bps = 200% → stake doubled (2×)
+- `25_000` bps = 250% → 2.5× payout
 - `null` → push — stake returned regardless of outcome
+
+The active treasury must hold enough to cover `payout − net_stake` (i.e. the profit). Set `max_win` accordingly when placing.
 
 <Note>
 All outcome values — both the resolver-attested `resolved_outcomes` in `settle` and the literal `value` in conditions — are scaled by 1,000,000. A score of 3 is represented as `3_000_000`.
@@ -72,24 +75,27 @@ All outcome values — both the resolver-attested `resolved_outcomes` in `settle
 
 ### Example: three-way soccer match (1X2)
 
+Each selection is a separate bet with its own payout matrix. The user picks one outcome — home win, draw, or away win — and the matrix pays out only if that outcome is resolved.
+
 ```typescript
 // outcome_slots: ["home_score", "away_score"]
-const payoutMatrix = [
-  // Home win: home_score > away_score → 2.5x
-  {
-    conditions: [{ o1: 0, o2: 1, op: "Gt", value: 0 }],
-    payout_bps: 25_000,
-  },
-  // Draw: home_score == away_score → 3x
-  {
-    conditions: [{ o1: 0, o2: 1, op: "Eq", value: 0 }],
-    payout_bps: 30_000,
-  },
-  // Away win: away_score > home_score → 2.7x
-  {
-    conditions: [{ o1: 1, o2: 0, op: "Gt", value: 0 }],
-    payout_bps: 27_000,
-  },
+
+// User bets on home win (2.5x)
+const homeWinMatrix = [
+  { conditions: [{ o1: 0, o2: 1, op: "Gt", value: 0 }], payout_bps: 25_000 },
+  { conditions: [], payout_bps: 0 }, // fallback: loss
+];
+
+// User bets on draw (3x)
+const drawMatrix = [
+  { conditions: [{ o1: 0, o2: 1, op: "Eq", value: 0 }], payout_bps: 30_000 },
+  { conditions: [], payout_bps: 0 }, // fallback: loss
+];
+
+// User bets on away win (2.7x)
+const awayWinMatrix = [
+  { conditions: [{ o1: 1, o2: 0, op: "Gt", value: 0 }], payout_bps: 27_000 },
+  { conditions: [], payout_bps: 0 }, // fallback: loss
 ];
 ```
 
