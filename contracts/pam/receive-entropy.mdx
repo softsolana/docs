@@ -26,7 +26,7 @@ The instruction verifies that:
 
 ## Errors
 
-| Error | Cause |
-|---|---|
-| `EntropyNotReady` | The Pyth keeper has not yet fulfilled the request, or `receive_entropy` has already run for this bet. |
-| `Unauthorized` | The request's sequence number, provider, or requester does not match what was recorded at placement. |
+| Code | Error | Cause |
+|---|---|---|
+| `6014` | `EntropyNotReady` | The Pyth keeper has not yet fulfilled the request, or `receive_entropy` has already run for this bet. |
+| `6000` | `Unauthorized` | The request's sequence number, provider, or requester does not match what was recorded at placement. |

@@ -52,9 +52,11 @@ Use [`get_quote`](/contracts/predict/get-quote) first to preview the trade and d
 
 ## Errors
 
-| Error | Cause |
-|---|---|
-| `TradingInactive` | The market has already been resolved. |
-| `InvalidOutcome` | `outcome_index` is out of range or is `0` (Inconclusive). |
-| `InsufficientTokens` | Selling more shares than the user holds. |
-| `SlippageExceeded` | Output fell below `slippage_limit`. |
+| Code | Error | Cause |
+|---|---|---|
+| `6026` | `TradingInactive` | The market has already been resolved. |
+| `6012` | `InvalidOutcome` | `outcome_index` is out of range or is `0` (Inconclusive). |
+| `6010` | `InvalidAmount` | `amount` is zero. |
+| `6008` | `InsufficientTokens` | Selling more shares than the user holds. |
+| `6024` | `SlippageExceeded` | Output fell below `slippage_limit`. |
+| `6017` | `MathOverflow` | Arithmetic overflow in share or payout calculation. |

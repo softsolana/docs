@@ -47,3 +47,10 @@ Probability values are scaled by 1,000,000. A probability of 0.65 (65%) is retur
 |---|:---:|---|
 | `option` | | Market PDA. Read-only. |
 | `operator` | | Operator wallet. Used to derive the market PDA. |
+
+## Errors
+
+| Code | Error | Cause |
+|---|---|---|
+| `6012` | `InvalidOutcome` | `outcome_index` is out of range. |
+| `6010` | `InvalidAmount` | `amount` is zero. |

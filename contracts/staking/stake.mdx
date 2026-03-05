@@ -26,3 +26,11 @@ If you already have an open stake, any pending rewards are settled internally be
 | `system_program` | | |
 | `token_program` | | |
 | `associated_token_program` | | |
+
+## Errors
+
+| Code | Error | Cause |
+|---|---|---|
+| `6001` | `InvalidAmount` | `amount` is zero. |
+| `6011` | `InvalidMint` | The provided mint does not match the mint recorded in the global staking state. |
+| `6005` | `MathOverflow` | Arithmetic overflow updating stake or reward accumulator. |

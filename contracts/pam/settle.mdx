@@ -74,7 +74,8 @@ const message = sha256(Buffer.concat([
 
 ## Errors
 
-| Error | Cause |
-|---|---|
-| `EntropyNotReady` | `receive_entropy` has not run yet (verifiable bets only). |
-| `ResolverVerificationFailed` | Fewer than `threshold` valid resolver signatures found, or a signature does not match the expected message. |
+| Code | Error | Cause |
+|---|---|---|
+| `6014` | `EntropyNotReady` | `receive_entropy` has not run yet (verifiable bets only). |
+| `6013` | `ResolverVerificationFailed` | Fewer than `threshold` valid resolver signatures found, or a signature does not match the expected message. |
+| `6001` | `InvalidAmount` | Calculated payout exceeds the escrow balance. |

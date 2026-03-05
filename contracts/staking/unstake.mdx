@@ -30,6 +30,8 @@ description: "Withdraw staked tokens and claim all accumulated rewards."
 
 ## Errors
 
-| Error | Cause |
-|---|---|
-| `InsufficientBalance` | `amount` exceeds your current staked balance. |
+| Code | Error | Cause |
+|---|---|---|
+| `6001` | `InvalidAmount` | `amount` is zero. |
+| `6004` | `InsufficientBalance` | `amount` exceeds your current staked balance. |
+| `6005` | `MathOverflow` | Arithmetic overflow updating stake or reward accumulator. |

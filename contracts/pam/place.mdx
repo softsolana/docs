@@ -5,7 +5,7 @@ description: "Create a new bet and lock collateral into escrow."
 
 `place` creates a `Bet` account, transfers `amount` USDC from the user into escrow, and locks `max_win` from the active treasury alongside it. This guarantees the maximum payout is available before settlement occurs.
 
-A protocol fee is deducted from `amount` at placement. The remainder (`net_stake`) is the base for all payout calculations. The fee is immediately routed to the yield vault for stakers.
+A protocol fee is handled transparently in the background — users do not experience any reduction in their bet size or winnings. The fee is routed to the yield vault for stakers.
 
 ## Parameters
 
@@ -14,7 +14,7 @@ A protocol fee is deducted from `amount` at placement. The remainder (`net_stake
 </ParamField>
 
 <ParamField body="max_win" type="u64" required>
-  Maximum amount, in USDC base units, that the user can win above their `net_stake`. The active treasury must hold at least this amount. Set to at least `(max_payout_bps / 10_000 − 1) × net_stake`.
+  Maximum amount, in USDC base units, that the user can win above their `amount`. The active treasury must hold at least this amount.
 </ParamField>
 
 <ParamField body="seed" type="u64" required>
@@ -70,25 +70,25 @@ type Condition = {
 All outcome values — both the resolver-attested `resolved_outcomes` in `settle` and the literal `value` in conditions — are scaled by 1,000,000. A score of 3 is represented as `3_000_000`.
 </Note>
 
-### Example: soccer match
+### Example: three-way soccer match (1X2)
 
 ```typescript
 // outcome_slots: ["home_score", "away_score"]
 const payoutMatrix = [
-  // Home win: home_score > away_score → 190% of stake returned
+  // Home win: home_score > away_score → 2.5x
   {
     conditions: [{ o1: 0, o2: 1, op: "Gt", value: 0 }],
-    payout_bps: 19_000,
+    payout_bps: 25_000,
   },
-  // Draw: home_score == away_score → stake returned
+  // Draw: home_score == away_score → 3x
   {
     conditions: [{ o1: 0, o2: 1, op: "Eq", value: 0 }],
-    payout_bps: null,
+    payout_bps: 30_000,
   },
-  // Away win (fallback, empty conditions always match) → loss
+  // Away win: away_score > home_score → 2.7x
   {
-    conditions: [],
-    payout_bps: 0,
+    conditions: [{ o1: 1, o2: 0, op: "Gt", value: 0 }],
+    payout_bps: 27_000,
   },
 ];
 ```
@@ -120,3 +120,11 @@ Literal comparisons (e.g. home team scored more than 2 goals) use `value` scaled
 | `system_program` | | |
 | `token_program` | | |
 | `associated_token_program` | | |
+
+## Errors
+
+| Code | Error | Cause |
+|---|---|---|
+| `6001` | `InvalidAmount` | `amount` is zero. |
+| `6010` | `MissingAccount` | `resolvers`, `outcome_slots`, or `payout_matrix` is empty, or required Pyth accounts are missing when `verifiable = true`. |
+| `6005` | `MathOverflow` | Arithmetic overflow in fee or escrow calculation. |

@@ -26,7 +26,7 @@
           {
             "group": "Player Account Management",
             "pages": [
-              "contracts/pam/pam-overview",
+              "contracts/pam/overview",
               "contracts/pam/initialize-platform",
               "contracts/pam/place",
               "contracts/pam/receive-entropy",
@@ -45,18 +45,17 @@
           {
             "group": "Staking",
             "pages": [
-              "contracts/pam/staking-overview",
-              "contracts/pam/stake",
-              "contracts/pam/claim",
-              "contracts/pam/unstake"
+              "contracts/staking/overview",
+              "contracts/staking/stake",
+              "contracts/staking/claim",
+              "contracts/staking/unstake"
             ]
           },
           {
             "group": "Resources",
             "pages": [
-              "contracts/pam/fees",
-              "contracts/pam/addresses",
-              "contracts/pam/error-codes"
+              "contracts/resources/addresses",
+              "contracts/resources/fees"
             ]
           }
         ]

@@ -32,3 +32,10 @@ Outcome `0` — **Inconclusive** — is always prepended by the contract. The ou
 | `option` | ✓ | Market PDA. Created by this instruction. |
 | `operator` | ✓ | Operator wallet. Signs the transaction and pays rent for the market PDA. |
 | `system_program` | | |
+
+## Errors
+
+| Code | Error | Cause |
+|---|---|---|
+| `6013` | `InvalidOutcomes` | Fewer than 2 outcomes provided. |
+| `6025` | `TooManyOutcomes` | More than 99 outcomes provided. |
