@@ -1,0 +1,60 @@
+---
+title: "Swap"
+description: "Buy outcome shares with USDC or sell shares back for USDC."
+---
+
+`swap` lets a user buy or sell shares in a specific outcome on an open prediction market. Prices are set by the LMSR pricing model and update with each trade. If the outcome a user holds wins, their shares redeem 1:1 for USDC.
+
+Use [`get_quote`](/contracts/predict/get-quote) first to preview the trade and determine a safe `slippage_limit`.
+
+## Parameters
+
+<ParamField body="option_identifier" type="string" required>
+  The market identifier used when the market was published.
+</ParamField>
+
+<ParamField body="outcome_index" type="u8" required>
+  Index of the outcome to buy or sell. Must be `1` or higher — outcome `0` (Inconclusive) cannot be traded.
+</ParamField>
+
+<ParamField body="is_buy" type="bool" required>
+  - `true` — spend USDC to buy outcome shares. `amount` is the total USDC including fees.
+  - `false` — sell outcome shares for USDC. `amount` is the number of shares to sell.
+</ParamField>
+
+<ParamField body="amount" type="u64" required>
+  USDC to spend in base units when buying, or number of shares when selling. Must be greater than zero.
+</ParamField>
+
+<ParamField body="slippage_limit" type="u64" required>
+  Minimum acceptable output. For buys, the minimum shares to receive. For sells, the minimum USDC to receive. The transaction fails with `SlippageExceeded` if the actual output falls below this value.
+</ParamField>
+
+## Accounts
+
+| Account | Writable | Description |
+|---|:---:|---|
+| `option` | ✓ | Market PDA. |
+| `position` | ✓ | User position PDA. Tracks the user's outcome share balances. Created on first swap. |
+| `user` | ✓ | The trader. Pays USDC when buying and rent for a new position account on first swap. |
+| `operator` | | Operator wallet. Used to derive the market PDA. |
+| `pam_program` | | PAM program. Used for CPI debit/credit. |
+| `softsol` | | CPI executor PDA. Signs PAM CPIs on behalf of the protocol. |
+| `softsol_treasury_authority` | | SoftSol treasury authority. |
+| `usdc_mint` | | USDC mint. |
+| `user_account` | ✓ | User's USDC associated token account. |
+| `softsol_treasury` | ✓ | SoftSol protocol treasury. Receives the platform fee. |
+| `operator_treasury` | ✓ | Operator's USDC account. Receives the operator fee. |
+| `operator_active_treasury` | ✓ | Operator active treasury PDA. |
+| `system_program` | | |
+| `token_program` | | |
+| `associated_token_program` | | |
+
+## Errors
+
+| Error | Cause |
+|---|---|
+| `TradingInactive` | The market has already been resolved. |
+| `InvalidOutcome` | `outcome_index` is out of range or is `0` (Inconclusive). |
+| `InsufficientTokens` | Selling more shares than the user holds. |
+| `SlippageExceeded` | Output fell below `slippage_limit`. |

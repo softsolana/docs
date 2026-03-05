@@ -11,7 +11,7 @@
     "default": "dark",
     "strict": true
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/logo/favicon.svg",
   "navigation": {
     "tabs": [
       {
@@ -36,7 +36,10 @@
           {
             "group": "Predict",
             "pages": [
-              "contracts/predict/overview"
+              "contracts/predict/overview",
+              "contracts/predict/publish-option",
+              "contracts/predict/get-quote",
+              "contracts/predict/swap"
             ]
           },
           {
@@ -63,9 +66,8 @@
 
   },
   "logo": {
-    "light": "/logo/dark.png",
-    "dark": "/logo/dark.png",
-    "width": 300
+    "light": "/logo/logo.png",
+    "dark": "/logo/logo.png"
   },
   "navbar": {
     "links": [

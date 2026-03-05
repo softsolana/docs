@@ -1,8 +1,24 @@
 ---
-title: "Predict"
-description: "Coming soon."
+title: "Overview"
+description: "Predict is a Logarithmic Market Scoring Rule (LMSR) prediction market program on Solana."
 ---
 
-<Note>
-  This section is under construction.
-</Note>
+`softsol_prediction` is an Anchor program that lets operators publish prediction markets and users trade outcome shares using USDC. Prices are determined algorithmically by an LMSR pricing model — no order book required.
+
+| | |
+|---|---|
+| Program ID | `soft9YRFsGkHPBjUn2iqcX11DEKsdaycfRM5AsMMmsG` |
+| Token | USDC |
+| Network | Solana (mainnet / devnet) |
+
+## How it works
+
+Each market has a set of outcomes. Users buy shares in the outcome they believe will occur. Share prices reflect the market's implied probability of each outcome. If the outcome a user holds wins, their shares redeem 1:1 for USDC.
+
+**Outcome 0 — Inconclusive** — always prepended automatically by the contract. It cannot be traded but can be declared as the result if the event is void.
+
+## Flow
+
+1. [`publish_option`](/contracts/predict/publish-option) — an operator creates a prediction market with named outcomes and a fee rate.
+2. [`get_quote`](/contracts/predict/get-quote) — simulate a buy or sell to preview shares, price, fees, and probability impact before submitting.
+3. [`swap`](/contracts/predict/swap) — buy outcome shares with USDC or sell shares back for USDC.
