@@ -7,7 +7,10 @@
     "light": "#ffffff",
     "dark": "#ffffff"
   },
-  "appearance": "dark",
+  "appearance": {
+    "default": "dark",
+    "strict": true
+  },
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
@@ -63,9 +66,7 @@
     "global": {}
 
   },
-  "logo": {
-    "dark": "/logo/dark.png"
-  },
+  "logo": "/logo/dark.png",
   "navbar": {
     "links": [
       {
