@@ -3,18 +3,19 @@
   "theme": "mint",
   "name": "SoftSol",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#ffffff",
+    "light": "#ffffff",
+    "dark": "#ffffff"
   },
+  "appearance": "dark",
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
       {
-        "tab": "Smart contracts",
+        "tab": "Documentation",
         "groups": [
           {
-            "group": "Overview",
+            "group": "Getting started",
             "pages": [
               "index"
             ]
@@ -23,12 +24,12 @@
             "group": "PAM",
             "pages": [
               "contracts/pam/overview",
-              "contracts/pam/addresses",
-              "contracts/pam/fees"
+              "contracts/pam/fees",
+              "contracts/pam/initialize-platform"
             ]
           },
           {
-            "group": "Betting",
+            "group": "Player Account Management",
             "pages": [
               "contracts/pam/place",
               "contracts/pam/receive-entropy",
@@ -42,6 +43,19 @@
               "contracts/pam/claim",
               "contracts/pam/unstake"
             ]
+          },
+          {
+            "group": "Predict",
+            "pages": [
+              "contracts/predict/overview"
+            ]
+          },
+          {
+            "group": "Resources",
+            "pages": [
+              "contracts/pam/addresses",
+              "contracts/pam/error-codes"
+            ]
           }
         ]
       }
@@ -50,8 +64,7 @@
 
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "dark": "/logo/dark.png"
   },
   "navbar": {
     "links": [

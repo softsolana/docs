@@ -1,0 +1,24 @@
+---
+title: "Initialize platform"
+description: "Set up a platform treasury and optionally seed it with an initial USDC deposit."
+---
+
+`initialize_platform` creates the `active_treasury` PDA for a platform wallet. This must be called once before any bets can be placed on that platform. An optional initial deposit can be made at the same time to fund the treasury.
+
+## Parameters
+
+<ParamField body="amount" type="u64" required>
+  Initial USDC deposit in base units (1 USDC = 1,000,000). Set to `0` to initialize the treasury without funding it.
+</ParamField>
+
+## Accounts
+
+| Account | Writable | Description |
+|---|:---:|---|
+| `platform` | ✓ | Platform wallet. Signs the transaction and pays rent for the treasury PDA. |
+| `active_treasury` | ✓ | Platform treasury PDA. Created by this instruction. Holds USDC to cover bet payouts. |
+| `platform_usdc_ata` | ✓ | Platform's USDC associated token account. Source of the initial deposit if `amount > 0`. |
+| `usdc_mint` | | USDC mint. |
+| `token_program` | | |
+| `associated_token_program` | | |
+| `system_program` | | |

@@ -1,0 +1,20 @@
+---
+title: "Error codes"
+description: "On-chain errors returned by the PAM program."
+---
+
+| Code | Message |
+|---|---|
+| `Unauthorized` | Unauthorized |
+| `InvalidAmount` | Invalid amount (must be > 0) |
+| `InvalidFees` | Invalid fees (must be > 0) |
+| `FeesExceedMax` | Fees cannot exceed 100% (10000 bps) |
+| `InsufficientBalance` | Insufficient balance |
+| `MathOverflow` | Math overflow |
+| `AccountNotInitialized` | Account not initialized — deposit first |
+| `InsufficientAccount` | Insufficient account |
+| `MissingAccount` | Missing required account |
+| `InvalidMint` | Invalid mint |
+| `BumpNotFound` | Bump not found |
+| `ResolverVerificationFailed` | Resolver attestation missing or invalid — check Ed25519 pre-instructions and threshold |
+| `EntropyNotReady` | Pyth Entropy has not yet fulfilled this request — call receive_entropy first |
