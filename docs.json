@@ -14,6 +14,12 @@
         "tab": "Smart contracts",
         "groups": [
           {
+            "group": "Overview",
+            "pages": [
+              "index"
+            ]
+          },
+          {
             "group": "PAM",
             "pages": [
               "contracts/pam/overview",
@@ -40,15 +46,8 @@
         ]
       }
     ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Discord",
-          "href": "https://discord.gg/placeholder",
-          "icon": "discord"
-        }
-      ]
-    }
+    "global": {}
+
   },
   "logo": {
     "light": "/logo/light.svg",
