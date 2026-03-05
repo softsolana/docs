@@ -18,12 +18,6 @@
         "tab": "Documentation",
         "groups": [
           {
-            "group": "Changelog",
-            "pages": [
-              "changelog"
-            ]
-          },
-          {
             "group": "Getting started",
             "pages": [
               "index"
@@ -71,10 +65,14 @@
   "logo": {
     "light": "/logo/dark.png",
     "dark": "/logo/dark.png",
-    "width": 160
+    "width": 300
   },
   "navbar": {
     "links": [
+      {
+        "label": "Changelog",
+        "href": "/changelog"
+      },
       {
         "label": "Support",
         "href": "mailto:hi@softsol.xyz"
