@@ -18,33 +18,25 @@
         "tab": "Documentation",
         "groups": [
           {
+            "group": "Changelog",
+            "pages": [
+              "changelog"
+            ]
+          },
+          {
             "group": "Getting started",
             "pages": [
               "index"
             ]
           },
           {
-            "group": "PAM",
-            "pages": [
-              "contracts/pam/overview",
-              "contracts/pam/fees",
-              "contracts/pam/initialize-platform"
-            ]
-          },
-          {
             "group": "Player Account Management",
             "pages": [
+              "contracts/pam/pam-overview",
+              "contracts/pam/initialize-platform",
               "contracts/pam/place",
               "contracts/pam/receive-entropy",
               "contracts/pam/settle"
-            ]
-          },
-          {
-            "group": "Staking",
-            "pages": [
-              "contracts/pam/stake",
-              "contracts/pam/claim",
-              "contracts/pam/unstake"
             ]
           },
           {
@@ -54,8 +46,18 @@
             ]
           },
           {
+            "group": "Staking",
+            "pages": [
+              "contracts/pam/staking-overview",
+              "contracts/pam/stake",
+              "contracts/pam/claim",
+              "contracts/pam/unstake"
+            ]
+          },
+          {
             "group": "Resources",
             "pages": [
+              "contracts/pam/fees",
               "contracts/pam/addresses",
               "contracts/pam/error-codes"
             ]
@@ -66,7 +68,11 @@
     "global": {}
 
   },
-  "logo": "/logo/dark.png",
+  "logo": {
+    "light": "/logo/dark.png",
+    "dark": "/logo/dark.png",
+    "width": 160
+  },
   "navbar": {
     "links": [
       {
