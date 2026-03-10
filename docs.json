@@ -34,12 +34,12 @@
             ]
           },
           {
-            "group": "Predict",
+            "group": "Pricing",
             "pages": [
-              "contracts/predict/overview",
-              "contracts/predict/publish-option",
-              "contracts/predict/get-quote",
-              "contracts/predict/swap"
+              "contracts/pricing/overview",
+              "contracts/pricing/publish-option",
+              "contracts/pricing/get-quote",
+              "contracts/pricing/swap"
             ]
           },
           {
@@ -49,6 +49,14 @@
               "contracts/staking/stake",
               "contracts/staking/claim",
               "contracts/staking/unstake"
+            ]
+          },
+          {
+            "group": "Resolution",
+            "pages": [
+              "contracts/resolution/overview",
+              "contracts/resolution/optimistic-oracle",
+              "contracts/resolution/external-feeds"
             ]
           },
           {
