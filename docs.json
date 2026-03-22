@@ -44,15 +44,6 @@
             ]
           },
           {
-            "group": "Resolution",
-            "pages": [
-              "contracts/resolution/overview",
-              "contracts/resolution/single-source",
-              "contracts/resolution/provably-fair",
-              "contracts/resolution/consensus"
-            ]
-          },
-          {
             "group": "Staking",
             "pages": [
               "contracts/staking/overview",
