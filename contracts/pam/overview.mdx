@@ -3,44 +3,33 @@ title: "Overview"
 description: "Instructions for managing player accounts, placing bets, and settling outcomes on the PAM program."
 ---
 
-The Player Account Management instructions handle the full lifecycle of a bet — from placement through to settlement.
+The Player Account Management (PAM) program handles the full lifecycle of a bet — from creating a resolution through to settlement.
 
 ## Program details
 
 | Network | Address |
 |---|---|
-| Solana Mainnet | `softQJxtQgY5fcAV3CKjxSRpzhAT4FWH6fhYCLsyEsn` |
-| Solana Devnet | `softQJxtQgY5fcAV3CKjxSRpzhAT4FWH6fhYCLsyEsn` |
+| Solana Mainnet | `soft4qNbN2X9oykC34VZKh1VA6dkKJJNjSeko1SzAWS` |
+| Solana Devnet | `soft4qNbN2X9oykC34VZKh1VA6dkKJJNjSeko1SzAWS` |
 
-## Complete Flow
+## Complete flow
 
 ```mermaid
 flowchart LR
-    SC[Softsol Contract] --> PL[Placement]
-    EC[External Caller]  --> PL
+    PL[Platform] -->|request_resolution| RES[Resolution\nPending]
 
-    PL --> FEE[Fee Collection]
-    PL --> ESC[Bet Escrow]
+    US[User] -->|place| ESC[Bet Escrow\nstake + max_win]
+    ESC --> RES
 
-    FEE --> YV[Yield Vault]
+    PL -->|submit_resolution| FIN[Resolution\nFinalized]
+    RES --> FIN
 
-    ESC --> VRF{Verifiable?}
+    ANY[Anyone] -->|settle| PAY{Payout\nMatrix}
+    FIN --> PAY
 
-    VRF -- Yes --> PE[Pyth Entropy]
-    VRF -- No  --> LS[Local Seed]
-
-    PE --> RE[Receive Entropy]
-    RE --> BET[Bet]
-    LS --> BET
-
-    BET --> SET[Settlement]
-
-    SET --> ATT[Resolver Attestation M-of-N Signatures]
-    ATT --> PAY{Payout Evaluation}
-
-    PAY -- Win --> UW[Payout]
-    PAY -- Loss --> TR[Return Active Treasury]
-    PAY -- Void/Push --> RS[Stake Returned to User]
+    PAY -- Win --> UW[Payout to User]
+    PAY -- Loss --> TR[Return to Treasury]
+    PAY -- Void/Push --> RS[Stake Returned]
 
     UW --> CL[Close Escrow]
     TR --> CL
@@ -50,16 +39,19 @@ flowchart LR
 ## Key concepts
 
 <AccordionGroup>
+  <Accordion title="Resolution account">
+    Every bet is linked to a **Resolution** PDA created by the platform via `request_resolution`. The resolution defines how the outcome will be determined (single authority, provably fair randomness, or consensus) and holds the final `resolved_slots` values once submitted. See the [Resolution](/contracts/resolution/overview) section for details on each method.
+  </Accordion>
   <Accordion title="Payout matrix">
-    Each bet defines an ordered list of conditions and their corresponding payouts in basis points of the stake. Rows are evaluated top-to-bottom and the first match wins. A `null` payout returns the stake (void/push). If no row matches, the bet is a loss.
-  </Accordion>
-  <Accordion title="Resolvers">
-    Off-chain services that observe real-world outcomes and sign attestations. Each bet defines its own resolver set and a minimum signature threshold (M-of-N), enabling trust models from a single operator up to fully decentralised multi-party agreement.
-  </Accordion>
-  <Accordion title="Verifiable randomness">
-    Bets can opt into Pyth Fortuna for provable on-chain randomness. The VRF seed is written into the bet by `receive_entropy` after the keeper fulfils the request, and is included in the resolver attestation message so all parties commit to the same outcome.
+    Each bet defines an ordered list of rows. Each row has one or more conditions on `resolved_slots` values and an absolute `payout_amount` in USDC base units. Rows are evaluated top-to-bottom; the first matching row wins. A `null` payout_amount is a void/push and returns the stake. If no row matches, the bet is a loss.
   </Accordion>
   <Accordion title="Escrow">
-    Funds are locked in a per-bet USDC escrow at placement (`amount + max_win`). Settlement pays the user from escrow and returns any remainder to the active treasury. The escrow account is closed at the end of settlement.
+    At placement, USDC is locked into a per-bet escrow PDA holding `stake + max_win`. The `max_win` is sourced from the active treasury. This guarantees the maximum payout is available before settlement. The escrow is closed at the end of settlement and any remainder is returned to the treasury.
+  </Accordion>
+  <Accordion title="Adjustable bets">
+    A bet can be modified before its Resolution finalizes by calling `place` again with the same `id`. The stake and payout matrix can both be updated — the contract reconciles the difference with the user and treasury automatically.
+  </Accordion>
+  <Accordion title="Protocol fee">
+    A fee in basis points is deducted from each stake at placement and routed to the yield vault for stakers. The default rate for third-party platforms is 10 bps. SoftSol-native contracts receive a lower rate. The fee does not reduce escrow collateral — `stake + max_win` is always fully funded.
   </Accordion>
 </AccordionGroup>

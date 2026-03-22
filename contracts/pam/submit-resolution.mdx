@@ -1,0 +1,69 @@
+---
+title: "Submit resolution"
+description: "Write resolved slot values to a Resolution account and finalize it."
+---
+
+`submit_resolution` writes the outcome to a `Resolution` account and sets its status to `Finalized`. Once finalized, all linked bets can be settled.
+
+Who must sign and what must be provided depends on the resolution method chosen at `request_resolution`.
+
+## Parameters
+
+<ParamField body="resolved_slots" type="(i64 | null)[]" required>
+  The authoritative output values for this resolution — up to 20 elements. These are read directly by `settle` when evaluating each bet's payout matrix. All values are scaled by 1,000,000 (e.g. a score of 3 is `3_000_000`). A `null` slot indicates the value is unavailable or unresolved.
+</ParamField>
+
+<ParamField body="certificate" type="ConsensusCertificate | null">
+  Required for the `Consensus` method. Pass `null` for all other methods.
+</ParamField>
+
+<ParamField body="server_seed" type="bytes | null">
+  Required for the `ProvablyFair` method. The pre-image of the committed `seed_hash`. Pass `null` for all other methods.
+</ParamField>
+
+<ParamField body="client_seed" type="bytes | null">
+  Optional for the `ProvablyFair` method. Mixed into the result hash alongside the server seed. Pass `null` to use an empty client seed.
+</ParamField>
+
+## Behavior by method
+
+<AccordionGroup>
+  <Accordion title="SingleSource">
+    `authority` must sign. If a `deadline` was set on the resolution, the current timestamp must be at or before it. If a `co_authority` was set, that account must also be present as a signer.
+
+    `resolved_slots` is written directly as provided — no further verification is performed.
+  </Accordion>
+  <Accordion title="ProvablyFair">
+    `server_seed` is required. The contract hashes it with SHA-256 and verifies it matches the `seed_hash` committed at `request_resolution`. This proves the outcome was not chosen after the fact.
+
+    The final result is derived as:
+
+    ```
+    result = SHA-256(server_seed || client_seed)
+    ```
+
+    `resolved_slots` is then computed deterministically from `result` according to the `selection_mode`. The `server_seed` is not required to sign — anyone can submit once the seed is known.
+
+    See [Provably Fair](/contracts/resolution/provably-fair) for details on how each `SelectionMode` maps `result` to `resolved_slots`.
+  </Accordion>
+  <Accordion title="Consensus (disabled)">
+    A `ConsensusCertificate` must be provided. The contract verifies that `outcome_stake / total_eligible_stake ≥ threshold_bps / 10,000`. Currently disabled — use `SingleSource` or `ProvablyFair` instead.
+  </Accordion>
+</AccordionGroup>
+
+## Accounts
+
+| Account | Writable | Description |
+|---|:---:|---|
+| `authority` | | Primary signer. For `SingleSource`, must match `method.authority`. |
+| `co_authority` | | _(SingleSource 2-of-2 only)_ Must match `method.co_authority` if set. |
+| `resolution` | ✓ | The Resolution to finalize. Must be `Pending`. |
+
+## Errors
+
+| Error | Cause |
+|---|---|
+| `Unauthorized` | Resolution is not `Pending`, authority key does not match, or deadline has passed. |
+| `MissingAccount` | `co_authority` account missing when required, or `server_seed` missing for `ProvablyFair`. |
+| `ResolverVerificationFailed` | `ProvablyFair`: SHA-256 of `server_seed` does not match committed `seed_hash`. `Consensus`: stake threshold not met. |
+| `TooManySlots` | `resolved_slots` contains more than 20 elements. |

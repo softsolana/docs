@@ -1,0 +1,48 @@
+---
+title: "Consensus"
+description: "Resolve outcomes using stake-weighted voting."
+---
+
+<Warning>
+  The Consensus resolution method is currently disabled. Calling `request_resolution` with a `Consensus` method will return a `ConsensusTempDisabled` error. Use [Single Source](/contracts/resolution/single-source) or [Provably Fair](/contracts/resolution/provably-fair) instead.
+</Warning>
+
+The `Consensus` method resolves outcomes through stake-weighted voting. A committee of stakers votes on the outcome off-chain, and the result is accepted on-chain once a configurable threshold of eligible stake has voted in agreement.
+
+## How it works
+
+1. At `request_resolution`, the platform sets a `threshold_bps`, `total_eligible_stake`, and a `deadline`.
+2. Off-chain, eligible stakers vote on `resolved_slots` values.
+3. A `ConsensusCertificate` is assembled from the votes — it includes an aggregate BLS signature and a Merkle root of the full vote set.
+4. At `submit_resolution`, the certificate is submitted. The contract verifies:
+   ```
+   outcome_stake / total_eligible_stake ≥ threshold_bps / 10,000
+   ```
+5. If the threshold is met, status moves to `Finalized`.
+
+If the threshold is not met or the deadline passes without submission, the resolution remains `Pending` and can enter a `Disputed` state.
+
+## Configuration
+
+```typescript
+{
+  Consensus: {
+    threshold_bps: number,          // required fraction of stake, in basis points (e.g. 6700 = 67%)
+    total_eligible_stake: number,   // total stake eligible to vote in this round
+    deadline: number,               // Unix timestamp; submission rejected after this
+    certificate: null,              // filled in by submit_resolution
+  }
+}
+```
+
+## ConsensusCertificate
+
+```typescript
+type ConsensusCertificate = {
+  outcome_stake: number,          // stake weight that voted for the attested outcome
+  total_voted_stake: number,      // total stake that cast any vote
+  participant_count: number,      // number of individual voters
+  vote_merkle_root: Uint8Array,   // 32-byte Merkle root of the off-chain vote set
+  aggregate_sig: Uint8Array,      // 64-byte BLS aggregate signature
+};
+```

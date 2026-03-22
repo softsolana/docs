@@ -1,81 +1,48 @@
 ---
 title: "Settle"
-description: "Resolve a bet and pay out based on the payout matrix."
+description: "Evaluate a bet's payout matrix and pay out the result."
 ---
 
-`settle` evaluates `resolved_outcomes` against the bet's payout matrix, verifies that enough resolvers have signed the outcome, and transfers funds to the user. The bet and escrow accounts are closed at the end and rent is returned to the user.
+`settle` reads `resolved_slots` from the linked `Resolution` account, evaluates the bet's payout matrix row by row, and transfers the appropriate amount to the user. The bet and escrow accounts are closed at the end of settlement.
 
-## Requirements
-
-Before calling `settle`:
-
-- For verifiable bets, [`receive_entropy`](/contracts/pam/receive-entropy) must have run successfully.
-- The transaction must include at least `threshold` **Ed25519 native-program pre-instructions**, each signed by a distinct key from the bet's `resolvers` list, all signing the same message (see below).
-
-## Resolver attestation
-
-Each resolver signs a 32-byte SHA-256 hash and submits it as an Ed25519 native-program instruction in the same transaction, before the `settle` instruction.
-
-```
-message = SHA-256(
-  bet_account_key         ||  // 32 bytes — the bet PDA public key
-  seed_le                 ||  // 8 bytes  — seed as little-endian u64
-  vrf_seed                ||  // 32 bytes — the bet's vrf_seed
-  borsh(resolved_outcomes)||  // 4-byte LE length prefix + 8-byte LE i64 per element
-  "ss_settle_v1"              // ASCII domain separator
-)
-```
-
-<Note>
-`borsh(resolved_outcomes)` is a standard Borsh-encoded `Vec<i64>`: a 4-byte little-endian length prefix followed by each value as an 8-byte little-endian i64.
-
-Use the **bet account PDA key** (not `bet.id`, which is the escrow key) as `bet_account_key`.
-</Note>
-
-```typescript
-import { sha256 } from "@noble/hashes/sha256";
-import { serialize } from "borsh";
-
-const message = sha256(Buffer.concat([
-  betAccountPubkey.toBuffer(),          // 32 bytes
-  seedToLE(seed),                       // 8 bytes (Buffer.from(new BN(seed).toArrayLike(Buffer, "le", 8)))
-  bet.vrfSeed,                          // 32 bytes
-  borshSerializeI64Vec(resolvedOutcomes),
-  Buffer.from("ss_settle_v1"),
-]));
-```
+Anyone can call `settle` — no specific authority is required. The Resolution must be `Finalized` before settlement can proceed.
 
 ## Parameters
 
-<ParamField body="seed" type="u64" required>
-  The same seed used when the bet was placed. Used to derive the bet and escrow PDAs.
+<ParamField body="id" type="u64" required>
+  The same `id` used when the bet was placed. Used to derive the bet and escrow PDAs.
 </ParamField>
 
-<ParamField body="resolved_outcomes" type="i64[]" required>
-  Attested values for each outcome slot, in the same order as `outcome_slots`. All values are scaled by 1,000,000 — a score of 3 is `3_000_000`. Must have the same length as `outcome_slots`.
-</ParamField>
+## Payout evaluation
+
+Rows in the payout matrix are tested top-to-bottom against the resolution's `resolved_slots`:
+
+- The **first row whose conditions all pass** determines the payout.
+- A `null` payout_amount is a **void/push** — the full stake is returned to the user.
+- If **no row matches**, the bet is a **loss** — the stake goes to the treasury.
+
+The payout is capped at the escrow balance. Any remainder after the payout is returned to the active treasury, and the escrow account is closed.
 
 ## Accounts
 
 | Account | Writable | Description |
 |---|:---:|---|
-| `operator` | | Authorised operator key. |
-| `platform` | | Platform wallet. |
+| `settler` | | Transaction signer. Can be anyone. |
+| `platform` | | Platform wallet. Used to derive PDAs. |
 | `user` | ✓ | The original bet placer. Receives payout and reclaimed rent. |
 | `bet_escrow` | ✓ | Escrow PDA. Closed at settlement. |
 | `bet` | ✓ | Bet descriptor PDA. Closed at settlement; rent returned to user. |
+| `resolution` | ✓ | The Resolution linked to this bet. Must be Finalized. |
 | `usdc_mint` | | USDC mint. |
 | `user_account` | ✓ | User's USDC associated token account. Receives the payout. |
 | `active_treasury` | ✓ | Platform treasury. Receives any unspent escrow funds. |
-| `instructions_sysvar` | | Solana instructions sysvar. Used to read Ed25519 pre-instructions. |
 | `system_program` | | |
 | `token_program` | | |
 | `associated_token_program` | | |
 
 ## Errors
 
-| Code | Error | Cause |
-|---|---|---|
-| `6014` | `EntropyNotReady` | `receive_entropy` has not run yet (verifiable bets only). |
-| `6013` | `ResolverVerificationFailed` | Fewer than `threshold` valid resolver signatures found, or a signature does not match the expected message. |
-| `6001` | `InvalidAmount` | Calculated payout exceeds the escrow balance. |
+| Error | Cause |
+|---|---|
+| `Unauthorized` | The linked Resolution is not yet Finalized. |
+| `MathOverflow` | Arithmetic overflow computing escrow remainder. |

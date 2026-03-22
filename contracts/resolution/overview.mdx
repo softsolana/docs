@@ -3,4 +3,47 @@ title: "Overview"
 description: "How outcomes are resolved on SoftSol."
 ---
 
-Coming soon.
+Resolution determines the outcome of a bet. Every bet is linked to a **Resolution** account at placement. Once that Resolution is finalized, any caller can settle the bet — the contract evaluates the bet's payout matrix against the resolved values and transfers funds accordingly.
+
+## Resolution methods
+
+SoftSol supports three resolution methods. The method is chosen when the platform creates the Resolution account via `request_resolution`.
+
+<CardGroup cols={3}>
+  <Card title="Single Source" icon="key" href="/contracts/resolution/single-source">
+    A designated authority — optionally requiring a second co-signer — writes the outcome directly. Simple and flexible.
+  </Card>
+  <Card title="Provably Fair" icon="shuffle" href="/contracts/resolution/provably-fair">
+    The platform commits a seed hash upfront. The outcome is derived deterministically from a server seed reveal combined with a client seed — verifiable by anyone.
+  </Card>
+  <Card title="Consensus" icon="users" href="/contracts/resolution/consensus">
+    A stake-weighted committee votes on the outcome. The result is accepted once a configurable threshold of eligible stake has voted in agreement.
+  </Card>
+</CardGroup>
+
+## Lifecycle
+
+All resolution methods share the same on-chain lifecycle:
+
+```
+request_resolution → [bets placed] → submit_resolution → settle
+     (Pending)                           (Finalized)
+```
+
+1. **`request_resolution`** — Platform creates a `Resolution` PDA with status `Pending` and encodes the method, deadline, and any ancillary metadata.
+2. **`place`** — Users place bets against the `Pending` resolution. Bets can be adjusted until the resolution finalizes.
+3. **`submit_resolution`** — The authorized party writes `resolved_slots` values to the account. Status moves to `Finalized`.
+4. **`settle`** — Anyone can call `settle` after finalization. The contract evaluates the bet's payout matrix row-by-row and transfers the appropriate amount to the user.
+
+## Resolved slots
+
+The output of every resolution is a `resolved_slots` array — up to 20 `Option<i64>` values. These are the raw inputs to each bet's payout matrix. What the values represent (a winning index, a price, a score) is determined by how the platform constructs the payout matrix at bet placement.
+
+## Payout matrix
+
+Each bet carries a payout matrix: an ordered list of rows, each with one or more conditions and a `payout_amount`. At settlement:
+
+- Rows are evaluated **top to bottom**.
+- The **first row whose conditions all pass** determines the payout.
+- A row with `payout_amount = None` is a **void/push** — the stake is returned.
+- If **no row matches**, the bet is a **loss** and the stake goes to the treasury.

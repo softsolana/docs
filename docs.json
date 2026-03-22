@@ -28,8 +28,9 @@
             "pages": [
               "contracts/pam/overview",
               "contracts/pam/initialize-platform",
+              "contracts/pam/request-resolution",
               "contracts/pam/place",
-              "contracts/pam/receive-entropy",
+              "contracts/pam/submit-resolution",
               "contracts/pam/settle"
             ]
           },
@@ -43,20 +44,21 @@
             ]
           },
           {
+            "group": "Resolution",
+            "pages": [
+              "contracts/resolution/overview",
+              "contracts/resolution/single-source",
+              "contracts/resolution/provably-fair",
+              "contracts/resolution/consensus"
+            ]
+          },
+          {
             "group": "Staking",
             "pages": [
               "contracts/staking/overview",
               "contracts/staking/stake",
               "contracts/staking/claim",
               "contracts/staking/unstake"
-            ]
-          },
-          {
-            "group": "Resolution",
-            "pages": [
-              "contracts/resolution/overview",
-              "contracts/resolution/optimistic-oracle",
-              "contracts/resolution/external-feeds"
             ]
           },
           {
