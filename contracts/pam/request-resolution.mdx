@@ -88,3 +88,71 @@ The platform signs this instruction and pays rent for the new account.
 | `AncillaryMissingOutcomes` | `ancillary` has no `o:` line, or all listed outcomes are empty. |
 | `ConsensusTempDisabled` | `Consensus` method was passed — currently disabled. |
 | `InvalidSeedHash` | `ProvablyFair` seed_hash is all zeros. |
+
+## Example
+
+<CodeGroup>
+```typescript SingleSource
+import * as anchor from "@coral-xyz/anchor";
+
+const id = new anchor.BN(1);
+
+const [resolution] = anchor.web3.PublicKey.findProgramAddressSync(
+  [Buffer.from("ss_resolution"), platform.publicKey.toBuffer(), id.toArrayLike(Buffer, "le", 8)],
+  program.programId
+);
+
+const ancillary = Buffer.from(
+  "q: Will team A beat team B?\no: yes, no",
+  "utf-8"
+);
+
+await program.methods
+  .requestResolution(id, { singleSource: { authority: authority.publicKey, deadline: null, coAuthority: null } }, ancillary)
+  .accounts({
+    platform: platform.publicKey,
+    resolution,
+  })
+  .signers([platform])
+  .rpc();
+```
+
+```typescript ProvablyFair
+import * as anchor from "@coral-xyz/anchor";
+import { sha256 } from "@noble/hashes/sha256";
+
+const id = new anchor.BN(2);
+
+const [resolution] = anchor.web3.PublicKey.findProgramAddressSync(
+  [Buffer.from("ss_resolution"), platform.publicKey.toBuffer(), id.toArrayLike(Buffer, "le", 8)],
+  program.programId
+);
+
+const serverSeed = crypto.getRandomValues(new Uint8Array(32));
+const seedHash = sha256(serverSeed); // commit — keep serverSeed secret until submit
+
+const ancillary = Buffer.from(
+  "q: Which side will win the coin flip?\no: heads, tails",
+  "utf-8"
+);
+
+await program.methods
+  .requestResolution(
+    id,
+    {
+      provablyFair: {
+        seedHash: Array.from(seedHash),
+        result: null,
+        selectionMode: { simple: { numSlots: 2 } },
+      },
+    },
+    ancillary
+  )
+  .accounts({
+    platform: platform.publicKey,
+    resolution,
+  })
+  .signers([platform])
+  .rpc();
+```
+</CodeGroup>

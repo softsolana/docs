@@ -3,7 +3,7 @@ title: "Overview"
 description: "Instructions for managing player accounts, placing bets, and settling outcomes on the PAM program."
 ---
 
-The Player Account Management (PAM) program handles the full lifecycle of a bet — from creating a resolution through to settlement.
+The Player Account Management (PAM) program handles the full lifecycle of a bet — from placement through to settlement.
 
 ## Program details
 
@@ -16,15 +16,15 @@ The Player Account Management (PAM) program handles the full lifecycle of a bet 
 
 ```mermaid
 flowchart LR
-    PL[Platform] -->|request_resolution| RES[Resolution\nPending]
+    PL[Platform] -->|request_resolution| RES[Resolution Pending]
 
-    US[User] -->|place| ESC[Bet Escrow\nstake + max_win]
+    US[User] -->|place| ESC[Bet Escrow (stake + max_win)]
     ESC --> RES
 
-    PL -->|submit_resolution| FIN[Resolution\nFinalized]
+    PL -->|submit_resolution| FIN[Resolution Finalized]
     RES --> FIN
 
-    ANY[Anyone] -->|settle| PAY{Payout\nMatrix}
+    ANY[Anyone] -->|settle| PAY{Payout Matrix}
     FIN --> PAY
 
     PAY -- Win --> UW[Payout to User]
