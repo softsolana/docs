@@ -18,7 +18,17 @@ The platform signs this instruction and pays rent for the new account.
 </ParamField>
 
 <ParamField body="ancillary" type="bytes" required>
-  Arbitrary off-chain metadata — up to 512 bytes. Use this to store a reference to the event, market identifier, or any other context needed by resolvers or clients. Pass an empty array if not needed.
+  UTF-8 encoded metadata for this resolution — up to 512 bytes. Must contain at least a question line and an outcomes line:
+
+  ```
+  q: Will team A beat team B?
+  o: yes, no
+  ```
+
+  - `q:` — the question being resolved (required, must be non-empty)
+  - `o:` — comma-separated list of possible outcomes (required, at least one non-empty value)
+
+  Additional lines are permitted and can carry any extra context.
 </ParamField>
 
 ## Resolution methods
@@ -28,7 +38,7 @@ The platform signs this instruction and pays rent for the new account.
 </Warning>
 
 <AccordionGroup>
-  <Accordion title="SingleSource">
+  <Accordion title="Single Source">
     A designated authority submits the outcome directly. An optional co-authority can be required for 2-of-2 sign-off, and an optional deadline enforces submission before a given Unix timestamp.
 
     ```typescript
@@ -40,8 +50,6 @@ The platform signs this instruction and pays rent for the new account.
       }
     }
     ```
-
-    See [Single Source](/contracts/resolution/single-source) for more detail.
   </Accordion>
   <Accordion title="ProvablyFair">
     The platform commits to a `seed_hash` (SHA-256 of a secret server seed) upfront. When submitting, the server seed is revealed and the outcome is derived deterministically — verifiable by anyone.
@@ -56,12 +64,9 @@ The platform signs this instruction and pays rent for the new account.
     }
     ```
 
-    See [Provably Fair](/contracts/resolution/provably-fair) for details on `SelectionMode` and outcome derivation.
   </Accordion>
-  <Accordion title="Consensus (disabled)">
-    Stake-weighted voting. Currently disabled — `request_resolution` will reject any `Consensus` method with a `ConsensusTempDisabled` error.
-
-    See [Consensus](/contracts/resolution/consensus) for how this method will work when enabled.
+  <Accordion title="Consensus">
+    Disabled
   </Accordion>
 </AccordionGroup>
 
@@ -78,5 +83,8 @@ The platform signs this instruction and pays rent for the new account.
 | Error | Cause |
 |---|---|
 | `AncillaryTooLarge` | `ancillary` exceeds 512 bytes. |
+| `AncillaryNotUtf8` | `ancillary` is not valid UTF-8. |
+| `AncillaryMissingQuestion` | `ancillary` has no `q:` line, or the question is empty. |
+| `AncillaryMissingOutcomes` | `ancillary` has no `o:` line, or all listed outcomes are empty. |
 | `ConsensusTempDisabled` | `Consensus` method was passed — currently disabled. |
 | `InvalidSeedHash` | `ProvablyFair` seed_hash is all zeros. |
