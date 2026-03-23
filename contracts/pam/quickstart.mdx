@@ -7,6 +7,11 @@ This example walks through the full PAM lifecycle — from creating a resolution
 
 ```typescript
 import * as anchor from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
+import type { SoftsolPam } from "./types/softsol_pam";
+import idl from "./idl/softsol_pam.json";
+
+const program = new Program<SoftsolPam>(idl as SoftsolPam, { connection });
 
 const OPERATOR = new anchor.web3.PublicKey("cxa3sYKNMk5L8PvDqEzWWLAfd4hr88d6U25W6Yz3FiE");
 const id = new anchor.BN(1);

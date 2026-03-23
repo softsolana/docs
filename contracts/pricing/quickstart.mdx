@@ -7,6 +7,11 @@ This example walks through the full Pricing lifecycle — from publishing a mark
 
 ```typescript
 import * as anchor from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
+import type { SoftsolPricing } from "./types/softsol_pricing";
+import idl from "./idl/softsol_pricing.json";
+
+const program = new Program<SoftsolPricing>(idl as SoftsolPricing, { connection });
 
 const PAM_PROGRAM_ID = new anchor.web3.PublicKey("soft4qNbN2X9oykC34VZKh1VA6dkKJJNjSeko1SzAWS");
 const OPERATOR = new anchor.web3.PublicKey("cxa3sYKNMk5L8PvDqEzWWLAfd4hr88d6U25W6Yz3FiE");
