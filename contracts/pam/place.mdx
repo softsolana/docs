@@ -47,41 +47,6 @@ The escrow is funded with `stake + max(payout_amount)` across all rows. The acti
 All `resolved_slots` values and literal `value` fields in conditions are scaled by 1,000,000. A score of 3 is represented as `3_000_000`.
 </Note>
 
-### Example: three-way soccer match (1X2)
-
-Each selection is a separate bet. The `resolved_slots` for this resolution are `[home_score, away_score]`.
-
-```typescript
-// User bets 10 USDC on home win — pays out 25 USDC if home score > away score
-const homeWinMatrix = [
-  {
-    conditions: [{ o1: 0, o2: 1, op: "Gt", value: 0 }],
-    payout_amount: 25_000_000,
-  },
-];
-
-// User bets 10 USDC on draw — pays out 30 USDC if scores are equal
-const drawMatrix = [
-  {
-    conditions: [{ o1: 0, o2: 1, op: "Eq", value: 0 }],
-    payout_amount: 30_000_000,
-  },
-];
-
-// User bets 10 USDC on away win — pays out 27 USDC if away score > home score
-const awayWinMatrix = [
-  {
-    conditions: [{ o1: 1, o2: 0, op: "Gt", value: 0 }],
-    payout_amount: 27_000_000,
-  },
-];
-```
-
-<Note>
-Slot-vs-slot comparisons (e.g. `home_score > away_score`) use `o2`. Set `value` to `0` — it is ignored when `o2` is provided.
-
-Literal comparisons (e.g. home team scored more than 2 goals) use `value` scaled by 1,000,000: `{ o1: 0, o2: null, op: "Gt", value: 2_000_000 }`.
-</Note>
 
 ## Accounts
 

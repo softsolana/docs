@@ -64,10 +64,6 @@ Use [`get_quote`](/contracts/pricing/get-quote) first to preview the trade and d
 ## Example
 
 ```typescript
-import * as anchor from "@coral-xyz/anchor";
-
-const PAM_PROGRAM_ID = new anchor.web3.PublicKey("soft4qNbN2X9oykC34VZKh1VA6dkKJJNjSeko1SzAWS");
-const OPERATOR = new anchor.web3.PublicKey("cxa3sYKNMk5L8PvDqEzWWLAfd4hr88d6U25W6Yz3FiE");
 const id = "world-cup-final-2026";
 
 // market is auto-derived; we need its key to derive the PAM PDAs
@@ -79,15 +75,15 @@ const marketSeed = market.toBuffer().subarray(0, 8);
 
 const [resolution] = anchor.web3.PublicKey.findProgramAddressSync(
   [Buffer.from("ss_resolution"), platform.publicKey.toBuffer(), marketSeed],
-  PAM_PROGRAM_ID
+  pamProgram.programId
 );
 const [betEscrow] = anchor.web3.PublicKey.findProgramAddressSync(
   [Buffer.from("ss_escrow"), platform.publicKey.toBuffer(), user.publicKey.toBuffer(), marketSeed],
-  PAM_PROGRAM_ID
+  pamProgram.programId
 );
 const [bet] = anchor.web3.PublicKey.findProgramAddressSync(
   [Buffer.from("ss_bet"), platform.publicKey.toBuffer(), user.publicKey.toBuffer(), marketSeed],
-  PAM_PROGRAM_ID
+  pamProgram.programId
 );
 
 // Buy 10 USDC of outcome 1, minimum 95% payout ratio
@@ -95,12 +91,11 @@ await program.methods
   .swap(id, 1, new anchor.BN(10_000_000), new anchor.BN(9_500), false)
   .accounts({
     platform: platform.publicKey,
-    operator: OPERATOR,
     user: user.publicKey,
     betEscrow,
     bet,
     resolution,
   })
-  .signers([operator, user])
+  .signers([user])
   .rpc();
 ```

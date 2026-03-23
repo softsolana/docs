@@ -57,10 +57,6 @@ The `resolver` authority defaults to the platform wallet if not provided.
 ## Quickstart
 
 ```typescript
-import * as anchor from "@coral-xyz/anchor";
-
-const PAM_PROGRAM_ID = new anchor.web3.PublicKey("soft4qNbN2X9oykC34VZKh1VA6dkKJJNjSeko1SzAWS");
-
 const id = "world-cup-final-2026";
 
 const [market] = anchor.web3.PublicKey.findProgramAddressSync(

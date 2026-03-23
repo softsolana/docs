@@ -105,22 +105,18 @@ const program = new Program<SoftsolPricing>(idl as SoftsolPricing, { connection 
       ],
       "accounts": [
         {
-          "name": "cpi_executor",
+          "name": "operator",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  99,
+                  111,
                   112,
-                  105,
-                  95,
                   101,
-                  120,
-                  101,
-                  99,
-                  117,
+                  114,
+                  97,
                   116,
                   111,
                   114
@@ -271,7 +267,24 @@ const program = new Program<SoftsolPricing>(idl as SoftsolPricing, { connection 
         },
         {
           "name": "operator",
-          "signer": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  112,
+                  101,
+                  114,
+                  97,
+                  116,
+                  111,
+                  114
+                ]
+              }
+            ]
+          }
         },
         {
           "name": "user",
@@ -1292,22 +1305,18 @@ export type SoftsolPricing = {
       ],
       "accounts": [
         {
-          "name": "cpiExecutor",
+          "name": "operator",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  99,
+                  111,
                   112,
-                  105,
-                  95,
                   101,
-                  120,
-                  101,
-                  99,
-                  117,
+                  114,
+                  97,
                   116,
                   111,
                   114
@@ -1458,7 +1467,24 @@ export type SoftsolPricing = {
         },
         {
           "name": "operator",
-          "signer": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  112,
+                  101,
+                  114,
+                  97,
+                  116,
+                  111,
+                  114
+                ]
+              }
+            ]
+          }
         },
         {
           "name": "user",
@@ -2381,7 +2407,6 @@ export type SoftsolPricing = {
     }
   ]
 };
-
 ```
 
 </CodeGroup>

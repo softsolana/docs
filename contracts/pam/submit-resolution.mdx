@@ -72,8 +72,6 @@ Who must sign and what must be provided depends on the resolution method chosen 
 
 <CodeGroup>
 ```typescript SingleSource
-import * as anchor from "@coral-xyz/anchor";
-
 // resolution is the pubkey returned/derived when request_resolution was called
 // home score = 2, away score = 1
 await program.methods
@@ -84,8 +82,6 @@ await program.methods
 ```
 
 ```typescript ProvablyFair
-import * as anchor from "@coral-xyz/anchor";
-
 // Reveal the server seed — resolved_slots are computed on-chain, pass []
 await program.methods
   .submitResolution([], null, Array.from(serverSeed), null)

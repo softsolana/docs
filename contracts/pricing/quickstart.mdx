@@ -13,6 +13,15 @@ import idl from "./idl/softsol_pricing.json";
 
 const program = new Program<SoftsolPricing>(idl as SoftsolPricing, { connection });
 
+// ── Load keypairs ─────────────────────────────────────────────────────────────
+// platform — the wallet that owns and pays for the market
+// operator — signs swap transactions (use the SoftSol operator or your own)
+// user     — the trader buying outcome shares
+
+const platform = anchor.web3.Keypair.fromSecretKey(Uint8Array.from(/* your platform keypair */));
+const operator = anchor.web3.Keypair.fromSecretKey(Uint8Array.from(/* your operator keypair */));
+const user     = anchor.web3.Keypair.fromSecretKey(Uint8Array.from(/* your user keypair */));
+
 const PAM_PROGRAM_ID = new anchor.web3.PublicKey("soft4qNbN2X9oykC34VZKh1VA6dkKJJNjSeko1SzAWS");
 const OPERATOR = new anchor.web3.PublicKey("cxa3sYKNMk5L8PvDqEzWWLAfd4hr88d6U25W6Yz3FiE");
 const id = "world-cup-final-2026";

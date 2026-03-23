@@ -13,6 +13,17 @@ import idl from "./idl/softsol_pam.json";
 
 const program = new Program<SoftsolPam>(idl as SoftsolPam, { connection });
 
+// ── Load keypairs ─────────────────────────────────────────────────────────────
+// platform  — the wallet that owns and pays for this resolution
+// authority — the resolver that will later submit the outcome (can equal platform)
+// user      — the bettor
+// settler   — anyone can settle once the resolution is finalized
+
+const platform  = anchor.web3.Keypair.fromSecretKey(Uint8Array.from(/* your platform keypair */));
+const authority = anchor.web3.Keypair.fromSecretKey(Uint8Array.from(/* your authority keypair */));
+const user      = anchor.web3.Keypair.fromSecretKey(Uint8Array.from(/* your user keypair */));
+const settler   = anchor.web3.Keypair.fromSecretKey(Uint8Array.from(/* your settler keypair */));
+
 const OPERATOR = new anchor.web3.PublicKey("cxa3sYKNMk5L8PvDqEzWWLAfd4hr88d6U25W6Yz3FiE");
 const id = new anchor.BN(1);
 

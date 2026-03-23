@@ -5,6 +5,27 @@ description: "Powering Casinos and Betting Markets with Web3 Infrastructure"
 
 Softsol is an on-chain B2B betting infrastructure provider built on a foundation of flexibility. Designed to be indistinguishable from traditional solutions, Softsol supports both Web2 and Web3 platforms — delivering the benefits of decentralisation without the friction. At the core of the ecosystem sits the PAM (Player Account Management) contract, serving as the primary gateway into the protocol.
 
+
+## User Groups
+
+There are 3 user groups, each with a distinct role in the protocol.
+
+<AccordionGroup>
+  <Accordion title="Operator">
+    Operators are authorised signers — typically the platform itself or a trusted backend service. Every bet placement and swap must be co-signed by an operator, giving platforms full control over who can interact with their markets.
+
+    Operators also determine the protocol fee rate applied to each bet. The SoftSol native operator (`cxa3sYKNMk5L8PvDqEzWWLAfd4hr88d6U25W6Yz3FiE`) receives a preferential fee rate; third-party operators are charged the standard rate.
+  </Accordion>
+  <Accordion title="Platform">
+    Platforms are the B2B customers of SoftSol — casino and betting operators building on top of the protocol. A platform wallet owns the active treasury, which holds the collateral required to back all open bet payouts. The platform signs market creation and resolution requests, and is responsible for funding the treasury before bets can be placed.
+
+    Platforms can delegate resolution authority to a separate key, or retain it themselves.
+  </Accordion>
+  <Accordion title="User">
+    Users are the end players — the bettors and traders interacting with the platform's product. They sign their own bet placements and swaps, paying their stake directly from their USDC token account. Users have no privileged access to platform or resolution functions; their interaction is limited to placing bets and settling winnings once a resolution is finalised.
+  </Accordion>
+</AccordionGroup>
+
 ## Smart contracts
 
 <CardGroup cols={2}>

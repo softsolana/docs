@@ -26,8 +26,6 @@ description: "Set up a platform treasury and optionally seed it with an initial 
 ## Example
 
 ```typescript
-import * as anchor from "@coral-xyz/anchor";
-
 await program.methods
   .initializePlatform(new anchor.BN(1000_000_000)) // 1,000 USDC initial deposit
   .accounts({
