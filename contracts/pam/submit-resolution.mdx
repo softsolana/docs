@@ -74,22 +74,11 @@ Who must sign and what must be provided depends on the resolution method chosen 
 ```typescript SingleSource
 import * as anchor from "@coral-xyz/anchor";
 
-const id = new anchor.BN(1);
-
-const [resolution] = anchor.web3.PublicKey.findProgramAddressSync(
-  [Buffer.from("ss_resolution"), platform.publicKey.toBuffer(), id.toArrayLike(Buffer, "le", 8)],
-  program.programId
-);
-
+// resolution is the pubkey returned/derived when request_resolution was called
 // home score = 2, away score = 1
-const resolvedSlots = [new anchor.BN(2_000_000), new anchor.BN(1_000_000)];
-
 await program.methods
-  .submitResolution(resolvedSlots, null, null, null)
-  .accounts({
-    authority: authority.publicKey,
-    resolution,
-  })
+  .submitResolution([new anchor.BN(2_000_000), new anchor.BN(1_000_000)], null, null, null)
+  .accounts({ authority: authority.publicKey, resolution })
   .signers([authority])
   .rpc();
 ```
@@ -97,21 +86,10 @@ await program.methods
 ```typescript ProvablyFair
 import * as anchor from "@coral-xyz/anchor";
 
-const id = new anchor.BN(2);
-
-const [resolution] = anchor.web3.PublicKey.findProgramAddressSync(
-  [Buffer.from("ss_resolution"), platform.publicKey.toBuffer(), id.toArrayLike(Buffer, "le", 8)],
-  program.programId
-);
-
-// Reveal the server seed committed at request_resolution.
-// resolved_slots are computed on-chain — pass null here.
+// Reveal the server seed — resolved_slots are computed on-chain, pass []
 await program.methods
   .submitResolution([], null, Array.from(serverSeed), null)
-  .accounts({
-    authority: authority.publicKey,
-    resolution,
-  })
+  .accounts({ authority: authority.publicKey, resolution })
   .signers([authority])
   .rpc();
 ```

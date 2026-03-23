@@ -51,31 +51,8 @@ The payout is capped at the escrow balance. Any remainder after the payout is re
 
 ```typescript
 import * as anchor from "@coral-xyz/anchor";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
-
-const USDC_MINT = new anchor.web3.PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
 
 const id = new anchor.BN(1);
-const idBytes = id.toArrayLike(Buffer, "le", 8);
-
-const [betEscrow] = anchor.web3.PublicKey.findProgramAddressSync(
-  [Buffer.from("ss_escrow"), platform.publicKey.toBuffer(), user.publicKey.toBuffer(), idBytes],
-  program.programId
-);
-const [bet] = anchor.web3.PublicKey.findProgramAddressSync(
-  [Buffer.from("ss_bet"), platform.publicKey.toBuffer(), user.publicKey.toBuffer(), idBytes],
-  program.programId
-);
-const [resolution] = anchor.web3.PublicKey.findProgramAddressSync(
-  [Buffer.from("ss_resolution"), platform.publicKey.toBuffer(), idBytes],
-  program.programId
-);
-const [activeTreasury] = anchor.web3.PublicKey.findProgramAddressSync(
-  [Buffer.from("ss_active_tres"), platform.publicKey.toBuffer()],
-  program.programId
-);
-
-const userAccount = await getAssociatedTokenAddress(USDC_MINT, user.publicKey);
 
 await program.methods
   .settle(id)
@@ -83,12 +60,7 @@ await program.methods
     settler: settler.publicKey,
     platform: platform.publicKey,
     user: user.publicKey,
-    betEscrow,
-    bet,
-    resolution,
-    usdcMint: USDC_MINT,
-    userAccount,
-    activeTreasury,
+    resolution, // the finalized Resolution PDA
   })
   .signers([settler])
   .rpc();

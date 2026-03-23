@@ -27,20 +27,24 @@
             "group": "Player Account Management",
             "pages": [
               "contracts/pam/overview",
+              "contracts/pam/quickstart",
               "contracts/pam/initialize-platform",
               "contracts/pam/request-resolution",
               "contracts/pam/place",
               "contracts/pam/submit-resolution",
-              "contracts/pam/settle"
+              "contracts/pam/settle",
+              "contracts/pam/idl"
             ]
           },
           {
             "group": "Pricing",
             "pages": [
               "contracts/pricing/overview",
-              "contracts/pricing/publish-option",
+              "contracts/pricing/quickstart",
+              "contracts/pricing/publish-market",
               "contracts/pricing/get-quote",
-              "contracts/pricing/swap"
+              "contracts/pricing/swap",
+              "contracts/pricing/idl"
             ]
           },
           {

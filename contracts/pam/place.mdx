@@ -115,40 +115,9 @@ Literal comparisons (e.g. home team scored more than 2 goals) use `value` scaled
 
 ```typescript
 import * as anchor from "@coral-xyz/anchor";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
 
-const USDC_MINT = new anchor.web3.PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
 const OPERATOR = new anchor.web3.PublicKey("cxa3sYKNMk5L8PvDqEzWWLAfd4hr88d6U25W6Yz3FiE");
-
 const id = new anchor.BN(1);
-const idBytes = id.toArrayLike(Buffer, "le", 8);
-
-const [betEscrow] = anchor.web3.PublicKey.findProgramAddressSync(
-  [Buffer.from("ss_escrow"), platform.publicKey.toBuffer(), user.publicKey.toBuffer(), idBytes],
-  program.programId
-);
-const [bet] = anchor.web3.PublicKey.findProgramAddressSync(
-  [Buffer.from("ss_bet"), platform.publicKey.toBuffer(), user.publicKey.toBuffer(), idBytes],
-  program.programId
-);
-const [resolution] = anchor.web3.PublicKey.findProgramAddressSync(
-  [Buffer.from("ss_resolution"), platform.publicKey.toBuffer(), id.toArrayLike(Buffer, "le", 8)],
-  program.programId
-);
-const [activeTreasury] = anchor.web3.PublicKey.findProgramAddressSync(
-  [Buffer.from("ss_active_tres"), platform.publicKey.toBuffer()],
-  program.programId
-);
-const [yieldVault] = anchor.web3.PublicKey.findProgramAddressSync(
-  [Buffer.from("yield_vault")],
-  program.programId
-);
-const [yieldState] = anchor.web3.PublicKey.findProgramAddressSync(
-  [Buffer.from("yield_state")],
-  program.programId
-);
-
-const userAccount = await getAssociatedTokenAddress(USDC_MINT, user.publicKey);
 
 // Bet 10 USDC on home win — pays out 25 USDC if home score > away score
 const payoutMatrix = [
@@ -164,14 +133,7 @@ await program.methods
     operator: OPERATOR,
     platform: platform.publicKey,
     user: user.publicKey,
-    betEscrow,
-    bet,
-    resolution,
-    usdcMint: USDC_MINT,
-    userAccount,
-    activeTreasury,
-    yieldVault,
-    yieldState,
+    resolution, // the Resolution PDA created by request_resolution
   })
   .signers([user])
   .rpc();

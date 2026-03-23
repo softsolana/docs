@@ -1,13 +1,13 @@
 ---
 title: "Get quote"
-description: "Simulate a buy or sell to preview the outcome before submitting a swap."
+description: "Simulate a buy to preview shares, payout, and probability impact before submitting a swap."
 ---
 
-`get_quote` is a read-only instruction that simulates a [`swap`](/contracts/predict/swap) and returns pricing information without modifying any state. Call this before submitting a swap to determine a safe `slippage_limit`.
+`get_quote` is a read-only instruction that simulates a buy and returns pricing information without modifying any state. Call this before submitting a swap to check the expected output and determine a safe `slippage_bps`.
 
 ## Parameters
 
-<ParamField body="option_identifier" type="string" required>
+<ParamField body="id" type="string" required>
   The market identifier used when the market was published.
 </ParamField>
 
@@ -15,42 +15,57 @@ description: "Simulate a buy or sell to preview the outcome before submitting a 
   Index of the outcome to quote. Must be `1` or higher — outcome `0` (Inconclusive) cannot be traded.
 </ParamField>
 
-<ParamField body="is_buy" type="bool" required>
-  - `true` — simulate buying shares with USDC. `amount` is the total USDC to spend including fees.
-  - `false` — simulate selling shares for USDC. `amount` is the number of shares to sell.
-</ParamField>
-
 <ParamField body="amount" type="u64" required>
-  USDC to spend in base units when buying, or number of shares when selling. Must be greater than zero.
+  USDC to spend in base units (1 USDC = 1,000,000). Must be greater than zero.
 </ParamField>
 
 ## Response
 
 ```typescript
 type QuoteResult = {
-  amount_out: u64;           // Shares received (buy) or net USDC received (sell)
-  price_per_share: u64;      // Effective price per share, scaled ×1,000,000
-  fees: u64;                 // Fee amount in USDC base units
-  potential_payout: u64;     // USDC received if this outcome wins (buy only; 0 for sell)
+  shares: u64;               // Outcome tokens received for this amount
+  payout_bps: u64;           // Payout as a percentage of stake if outcome wins, in basis points
+  price_per_share: u64;      // Effective USDC cost per share, scaled ×1,000,000
   current_probability: u64;  // Current implied probability of the outcome, scaled ×1,000,000
   new_probability: u64;      // Implied probability after the trade, scaled ×1,000,000
 };
 ```
 
 <Note>
-Probability values are scaled by 1,000,000. A probability of 0.65 (65%) is returned as `650_000`.
+Probability values are scaled by 1,000,000. A probability of 65% is returned as `650_000`.
+
+`payout_bps` is in basis points: `10_000` means break even (1×), `20_000` means 2× your stake.
 </Note>
 
 ## Accounts
 
 | Account | Writable | Description |
 |---|:---:|---|
-| `option` | | Market PDA. Read-only. |
-| `operator` | | Operator wallet. Used to derive the market PDA. |
+| `market` | | Market PDA. Read-only. |
+| `platform` | | Platform wallet. Used to derive the market PDA. |
 
 ## Errors
 
-| Code | Error | Cause |
-|---|---|---|
-| `6012` | `InvalidOutcome` | `outcome_index` is out of range. |
-| `6010` | `InvalidAmount` | `amount` is zero. |
+| Error | Cause |
+|---|---|
+| `InvalidOutcome` | `outcome_index` is `0` or out of range. |
+| `InvalidAmount` | `amount` is zero or too small to produce a non-zero net amount after margin. |
+
+## Quickstart
+
+```typescript
+import * as anchor from "@coral-xyz/anchor";
+
+const id = "world-cup-final-2026";
+
+const quote = await program.methods
+  .getQuote(id, 1, new anchor.BN(10_000_000)) // simulate buying outcome 1 with 10 USDC
+  .accounts({ platform: platform.publicKey })
+  .view();
+
+console.log(`Shares received:       ${quote.shares}`);
+console.log(`Payout if win:         ${quote.payoutBps / 100}% of stake`);
+console.log(`Price per share:       ${quote.pricePerShare / 1_000_000} USDC`);
+console.log(`Current probability:   ${quote.currentProbability / 10_000}%`);
+console.log(`Probability after buy: ${quote.newProbability / 10_000}%`);
+```

@@ -27,24 +27,11 @@ description: "Set up a platform treasury and optionally seed it with an initial 
 
 ```typescript
 import * as anchor from "@coral-xyz/anchor";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
-
-const USDC_MINT = new anchor.web3.PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
-
-const [activeTreasury] = anchor.web3.PublicKey.findProgramAddressSync(
-  [Buffer.from("ss_active_tres"), platform.publicKey.toBuffer()],
-  program.programId
-);
-
-const platformUsdcAta = await getAssociatedTokenAddress(USDC_MINT, platform.publicKey);
 
 await program.methods
   .initializePlatform(new anchor.BN(1000_000_000)) // 1,000 USDC initial deposit
   .accounts({
     platform: platform.publicKey,
-    activeTreasury,
-    platformUsdcAta,
-    usdcMint: USDC_MINT,
   })
   .signers([platform])
   .rpc();

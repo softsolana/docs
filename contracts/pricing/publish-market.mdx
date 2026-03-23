@@ -1,0 +1,88 @@
+---
+title: "Publish market"
+description: "Create a new outcome market with named outcomes and a margin rate."
+---
+
+`publish_market` creates a `Market` account and automatically calls `request_resolution` on the PAM program via CPI to create the linked `Resolution` account. Once published, users can trade outcome shares via [`swap`](/contracts/pricing/swap).
+
+Outcomes are parsed from the `ancillary` field — the same `q:`/`o:` format used by the PAM program. Outcome `0` — **Inconclusive** — is always prepended automatically. The outcomes you supply start at index `1`.
+
+The `resolver` authority defaults to the platform wallet if not provided.
+
+## Parameters
+
+<ParamField body="id" type="string" required>
+  Unique identifier for this market, scoped to the platform. Max 50 characters. Used to derive the market PDA.
+</ParamField>
+
+<ParamField body="ancillary" type="bytes" required>
+  UTF-8 encoded metadata — up to 512 bytes. Must contain a question line and an outcomes line:
+
+  ```
+  q: Who will win the match?
+  o: Team A, Team B, Draw
+  ```
+
+  - `q:` — the question being predicted (required, must be non-empty)
+  - `o:` — comma-separated list of outcome names (required, at least 2, max 99)
+</ParamField>
+
+<ParamField body="margin_bps" type="u64" required>
+  Overround applied to LSMR pricing in basis points. Must be less than `10,000`. A higher value increases implied probabilities above 100% in aggregate, widening the spread between buy and sell prices. For example, `200` applies a 2% margin.
+</ParamField>
+
+<ParamField body="resolver" type="Pubkey | null">
+  The authority that will submit the outcome via `submit_resolution` on the PAM program. If `null`, defaults to the platform wallet.
+</ParamField>
+
+## Accounts
+
+| Account | Writable | Description |
+|---|:---:|---|
+| `market` | ✓ | Market PDA. Created by this instruction. |
+| `platform` | ✓ | Platform wallet. Signs the transaction and pays rent. |
+| `pam_program` | | PAM program. Used for `request_resolution` CPI. |
+| `resolution` | ✓ | Resolution PDA. Created via CPI to the PAM program. |
+| `system_program` | | |
+
+## Errors
+
+| Error | Cause |
+|---|---|
+| `InvalidAncillary` | `ancillary` is not valid UTF-8 or has no `o:` line. |
+| `InvalidOutcomes` | Fewer than 2 outcomes parsed from `ancillary`. |
+| `TooManyOutcomes` | More than 99 outcomes parsed from `ancillary`. |
+| `InvalidAmount` | `margin_bps` is `10,000` or higher. |
+
+## Quickstart
+
+```typescript
+import * as anchor from "@coral-xyz/anchor";
+
+const PAM_PROGRAM_ID = new anchor.web3.PublicKey("soft4qNbN2X9oykC34VZKh1VA6dkKJJNjSeko1SzAWS");
+
+const id = "world-cup-final-2026";
+
+const [market] = anchor.web3.PublicKey.findProgramAddressSync(
+  [Buffer.from("ss_market"), platform.publicKey.toBuffer(), Buffer.from(id)],
+  program.programId
+);
+
+// Resolution ID is the first 8 bytes of the market PDA key interpreted as a little-endian u64
+const marketKeyBytes = market.toBuffer();
+const [resolution] = anchor.web3.PublicKey.findProgramAddressSync(
+  [Buffer.from("ss_resolution"), platform.publicKey.toBuffer(), marketKeyBytes.subarray(0, 8)],
+  PAM_PROGRAM_ID
+);
+
+const ancillary = Buffer.from(
+  "q: Who will win the World Cup final?\no: Brazil, France, Argentina",
+  "utf-8"
+);
+
+await program.methods
+  .publishMarket(id, ancillary, new anchor.BN(200), null) // 2% margin, resolver = platform
+  .accounts({ platform: platform.publicKey, resolution })
+  .signers([platform])
+  .rpc();
+```

@@ -1,0 +1,1178 @@
+{
+  "address": "soft93xcMpgmP9DJk3FRAqYiH919kE95aiJYiYUqb27",
+  "metadata": {
+    "name": "softsol_pricing",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Softsol Outcome Market Pricing model"
+  },
+  "instructions": [
+    {
+      "name": "get_quote",
+      "discriminator": [
+        101,
+        1,
+        95,
+        4,
+        216,
+        171,
+        16,
+        197
+      ],
+      "accounts": [
+        {
+          "name": "market",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  115,
+                  95,
+                  109,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "platform"
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "platform"
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "outcome_index",
+          "type": "u8"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "QuoteResult"
+        }
+      }
+    },
+    {
+      "name": "initialize",
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "cpi_executor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  112,
+                  105,
+                  95,
+                  101,
+                  120,
+                  101,
+                  99,
+                  117,
+                  116,
+                  111,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "publish_market",
+      "discriminator": [
+        145,
+        24,
+        249,
+        5,
+        188,
+        66,
+        211,
+        38
+      ],
+      "accounts": [
+        {
+          "name": "market",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  115,
+                  95,
+                  109,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "platform"
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "platform",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pam_program",
+          "address": "soft4qNbN2X9oykC34VZKh1VA6dkKJJNjSeko1SzAWS"
+        },
+        {
+          "name": "resolution",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "ancillary",
+          "type": "bytes"
+        },
+        {
+          "name": "margin_bps",
+          "type": "u64"
+        },
+        {
+          "name": "resolver",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "swap",
+      "discriminator": [
+        248,
+        198,
+        158,
+        145,
+        225,
+        117,
+        135,
+        200
+      ],
+      "accounts": [
+        {
+          "name": "market",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  115,
+                  95,
+                  109,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "platform"
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "platform"
+        },
+        {
+          "name": "operator",
+          "signer": true
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pam_program",
+          "address": "soft4qNbN2X9oykC34VZKh1VA6dkKJJNjSeko1SzAWS"
+        },
+        {
+          "name": "bet_escrow",
+          "writable": true
+        },
+        {
+          "name": "bet",
+          "writable": true
+        },
+        {
+          "name": "resolution",
+          "docs": [
+            "Resolution for this market — must not be finalized."
+          ],
+          "writable": true
+        },
+        {
+          "name": "usdc_mint",
+          "address": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"
+        },
+        {
+          "name": "user_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "usdc_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "active_treasury",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  115,
+                  95,
+                  97,
+                  99,
+                  116,
+                  105,
+                  118,
+                  101,
+                  95,
+                  116,
+                  114,
+                  101,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "platform"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                13,
+                3,
+                207,
+                143,
+                233,
+                52,
+                240,
+                60,
+                108,
+                215,
+                40,
+                141,
+                149,
+                175,
+                230,
+                1,
+                251,
+                10,
+                65,
+                83,
+                221,
+                207,
+                27,
+                81,
+                42,
+                116,
+                77,
+                207,
+                176,
+                168,
+                168,
+                103
+              ]
+            }
+          }
+        },
+        {
+          "name": "yield_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  121,
+                  105,
+                  101,
+                  108,
+                  100,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                13,
+                3,
+                207,
+                143,
+                233,
+                52,
+                240,
+                60,
+                108,
+                215,
+                40,
+                141,
+                149,
+                175,
+                230,
+                1,
+                251,
+                10,
+                65,
+                83,
+                221,
+                207,
+                27,
+                81,
+                42,
+                116,
+                77,
+                207,
+                176,
+                168,
+                168,
+                103
+              ]
+            }
+          }
+        },
+        {
+          "name": "yield_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  121,
+                  105,
+                  101,
+                  108,
+                  100,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                13,
+                3,
+                207,
+                143,
+                233,
+                52,
+                240,
+                60,
+                108,
+                215,
+                40,
+                141,
+                149,
+                175,
+                230,
+                1,
+                251,
+                10,
+                65,
+                83,
+                221,
+                207,
+                27,
+                81,
+                42,
+                116,
+                77,
+                207,
+                176,
+                168,
+                168,
+                103
+              ]
+            }
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "outcome_index",
+          "type": "u8"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "slippage_bps",
+          "type": "u64"
+        },
+        {
+          "name": "is_sell",
+          "type": "bool"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Market",
+      "discriminator": [
+        219,
+        190,
+        213,
+        55,
+        0,
+        227,
+        198,
+        154
+      ]
+    },
+    {
+      "name": "Resolution",
+      "discriminator": [
+        31,
+        13,
+        235,
+        201,
+        17,
+        66,
+        5,
+        138
+      ]
+    },
+    {
+      "name": "YieldState",
+      "discriminator": [
+        98,
+        182,
+        247,
+        149,
+        10,
+        209,
+        98,
+        152
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "AlreadyDeclared",
+      "msg": "This address has already declared an outcome"
+    },
+    {
+      "code": 6001,
+      "name": "BondsmenPhaseEnded",
+      "msg": "Bondsmen phase has ended"
+    },
+    {
+      "code": 6002,
+      "name": "DisputeThresholdExceeded",
+      "msg": "Dispute threshold exceeded"
+    },
+    {
+      "code": 6003,
+      "name": "DisputeWindowNotExpired",
+      "msg": "Dispute window still active"
+    },
+    {
+      "code": 6004,
+      "name": "IncorrectVote",
+      "msg": "Voter did not vote for the winning outcome"
+    },
+    {
+      "code": 6005,
+      "name": "InconclusiveNotAllowedFirst",
+      "msg": "Inconclusive cannot be the first declared outcome"
+    },
+    {
+      "code": 6006,
+      "name": "InsufficientBalance",
+      "msg": "Insufficient balance"
+    },
+    {
+      "code": 6007,
+      "name": "InsufficientShares",
+      "msg": "Insufficient shares"
+    },
+    {
+      "code": 6008,
+      "name": "InsufficientTokens",
+      "msg": "Insufficient token balance"
+    },
+    {
+      "code": 6009,
+      "name": "InvalidAccount",
+      "msg": "Invalid account"
+    },
+    {
+      "code": 6010,
+      "name": "InvalidAncillary",
+      "msg": "Invalid ancillary data"
+    },
+    {
+      "code": 6011,
+      "name": "InvalidAmount",
+      "msg": "Invalid amount"
+    },
+    {
+      "code": 6012,
+      "name": "InvalidMarketType",
+      "msg": "Invalid market type"
+    },
+    {
+      "code": 6013,
+      "name": "InvalidOutcome",
+      "msg": "Invalid outcome index"
+    },
+    {
+      "code": 6014,
+      "name": "InvalidOutcomes",
+      "msg": "Must have at least 2 outcomes"
+    },
+    {
+      "code": 6015,
+      "name": "InvalidVote",
+      "msg": "Invalid vote"
+    },
+    {
+      "code": 6016,
+      "name": "InvalidVoteAccount",
+      "msg": "Invalid vote account"
+    },
+    {
+      "code": 6017,
+      "name": "InvalidVoter",
+      "msg": "Invalid voter"
+    },
+    {
+      "code": 6018,
+      "name": "MathOverflow",
+      "msg": "Math overflow"
+    },
+    {
+      "code": 6019,
+      "name": "NoCorrectVotes",
+      "msg": "No correct votes recorded"
+    },
+    {
+      "code": 6020,
+      "name": "NoOutcomeDeclared",
+      "msg": "No outcome declared"
+    },
+    {
+      "code": 6021,
+      "name": "NoPosition",
+      "msg": "User has no position on this market"
+    },
+    {
+      "code": 6022,
+      "name": "NoRewardAvailable",
+      "msg": "No reward available"
+    },
+    {
+      "code": 6023,
+      "name": "NoTokensToSettle",
+      "msg": "No tokens to settle"
+    },
+    {
+      "code": 6024,
+      "name": "OutcomeNotFinalized",
+      "msg": "Outcome has not been finalized"
+    },
+    {
+      "code": 6025,
+      "name": "SlippageExceeded",
+      "msg": "Slippage tolerance exceeded"
+    },
+    {
+      "code": 6026,
+      "name": "TooManyOutcomes",
+      "msg": "Too many outcomes (max 99)"
+    },
+    {
+      "code": 6027,
+      "name": "TradingInactive",
+      "msg": "Trading is not active"
+    },
+    {
+      "code": 6028,
+      "name": "UnauthorizedCategory",
+      "msg": "Provider is not authorized for this category"
+    },
+    {
+      "code": 6029,
+      "name": "UnauthorizedOperator",
+      "msg": "Not authorized as operator"
+    },
+    {
+      "code": 6030,
+      "name": "VotingNotComplete",
+      "msg": "Voting period not complete"
+    },
+    {
+      "code": 6031,
+      "name": "VotingNotStarted",
+      "msg": "Voting has not started yet"
+    },
+    {
+      "code": 6032,
+      "name": "VotingPeriodExpired",
+      "msg": "Voting period has expired"
+    }
+  ],
+  "types": [
+    {
+      "name": "ConsensusCertificate",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "outcome_stake",
+            "type": "u64"
+          },
+          {
+            "name": "total_voted_stake",
+            "type": "u64"
+          },
+          {
+            "name": "participant_count",
+            "type": "u32"
+          },
+          {
+            "name": "vote_merkle_root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "aggregate_sig",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Market",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "margin_bps",
+            "type": "u64"
+          },
+          {
+            "name": "outcomes",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "shares",
+            "type": {
+              "vec": "u64"
+            }
+          },
+          {
+            "name": "liquidity",
+            "type": "u64"
+          },
+          {
+            "name": "reserves",
+            "type": {
+              "vec": "u64"
+            }
+          },
+          {
+            "name": "k_constant",
+            "type": "u128"
+          },
+          {
+            "name": "last_probability",
+            "type": {
+              "vec": "u64"
+            }
+          },
+          {
+            "name": "outcome",
+            "type": {
+              "option": "u8"
+            }
+          },
+          {
+            "name": "resolver",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "QuoteResult",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "shares",
+            "type": "u64"
+          },
+          {
+            "name": "payout_bps",
+            "type": "u64"
+          },
+          {
+            "name": "price_per_share",
+            "type": "u64"
+          },
+          {
+            "name": "current_probability",
+            "type": "u64"
+          },
+          {
+            "name": "new_probability",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Resolution",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "pubkey"
+          },
+          {
+            "name": "method",
+            "type": {
+              "defined": {
+                "name": "ResolutionMethod"
+              }
+            }
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "ResolutionStatus"
+              }
+            }
+          },
+          {
+            "name": "ancillary",
+            "type": "bytes"
+          },
+          {
+            "name": "resolved_slots",
+            "type": {
+              "vec": {
+                "option": "i64"
+              }
+            }
+          },
+          {
+            "name": "open_positions",
+            "type": {
+              "option": "u32"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ResolutionMethod",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Consensus",
+            "fields": [
+              {
+                "name": "threshold_bps",
+                "type": "u16"
+              },
+              {
+                "name": "total_eligible_stake",
+                "type": "u64"
+              },
+              {
+                "name": "deadline",
+                "type": "i64"
+              },
+              {
+                "name": "certificate",
+                "type": {
+                  "option": {
+                    "defined": {
+                      "name": "ConsensusCertificate"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "name": "SingleSource",
+            "fields": [
+              {
+                "name": "authority",
+                "type": "pubkey"
+              },
+              {
+                "name": "deadline",
+                "type": {
+                  "option": "i64"
+                }
+              },
+              {
+                "name": "co_authority",
+                "type": {
+                  "option": "pubkey"
+                }
+              }
+            ]
+          },
+          {
+            "name": "ProvablyFair",
+            "fields": [
+              {
+                "name": "seed_hash",
+                "type": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              },
+              {
+                "name": "result",
+                "type": {
+                  "option": {
+                    "array": [
+                      "u8",
+                      32
+                    ]
+                  }
+                }
+              },
+              {
+                "name": "selection_mode",
+                "type": {
+                  "defined": {
+                    "name": "SelectionMode"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ResolutionStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Pending"
+          },
+          {
+            "name": "Finalized"
+          },
+          {
+            "name": "Disputed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SelectionMode",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Simple",
+            "fields": [
+              {
+                "name": "num_slots",
+                "type": "u8"
+              }
+            ]
+          },
+          {
+            "name": "Weighted",
+            "fields": [
+              {
+                "defined": {
+                  "name": "Weights"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Modulo",
+            "fields": [
+              {
+                "name": "num_slots",
+                "type": "u8"
+              },
+              {
+                "name": "divisor",
+                "type": "u16"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Weights",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "values",
+            "type": {
+              "vec": "u16"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "YieldState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "acc_reward_per_share",
+            "type": "u128"
+          },
+          {
+            "name": "total_staked",
+            "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "constants": [
+    {
+      "name": "USDC_MINT",
+      "type": "pubkey",
+      "value": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"
+    }
+  ]
+}

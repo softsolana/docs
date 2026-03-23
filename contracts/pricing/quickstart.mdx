@@ -1,0 +1,76 @@
+---
+title: "Quickstart"
+description: "End-to-end example: publish a market, get a quote, and swap."
+---
+
+This example walks through the full Pricing lifecycle — from publishing a market to buying outcome shares.
+
+```typescript
+import * as anchor from "@coral-xyz/anchor";
+
+const PAM_PROGRAM_ID = new anchor.web3.PublicKey("soft4qNbN2X9oykC34VZKh1VA6dkKJJNjSeko1SzAWS");
+const OPERATOR = new anchor.web3.PublicKey("cxa3sYKNMk5L8PvDqEzWWLAfd4hr88d6U25W6Yz3FiE");
+const id = "world-cup-final-2026";
+
+// ── Derive PDAs needed across multiple calls ──────────────────────────────────
+// market is auto-derived by Anchor, but we need its key to derive the PAM PDAs
+
+const [market] = anchor.web3.PublicKey.findProgramAddressSync(
+  [Buffer.from("ss_market"), platform.publicKey.toBuffer(), Buffer.from(id)],
+  program.programId
+);
+const marketSeed = market.toBuffer().subarray(0, 8);
+
+const [resolution] = anchor.web3.PublicKey.findProgramAddressSync(
+  [Buffer.from("ss_resolution"), platform.publicKey.toBuffer(), marketSeed],
+  PAM_PROGRAM_ID
+);
+
+// ── Step 1: Publish the market ────────────────────────────────────────────────
+
+await program.methods
+  .publishMarket(
+    id,
+    Buffer.from("q: Who will win the World Cup final?\no: Brazil, France, Argentina", "utf-8"),
+    new anchor.BN(200), // 2% margin
+    null               // resolver defaults to platform
+  )
+  .accounts({ platform: platform.publicKey, resolution })
+  .signers([platform])
+  .rpc();
+
+// ── Step 2: Get a quote ───────────────────────────────────────────────────────
+
+const quote = await program.methods
+  .getQuote(id, 1, new anchor.BN(10_000_000)) // simulate buying outcome 1 with 10 USDC
+  .accounts({ platform: platform.publicKey })
+  .view();
+
+console.log(`Shares: ${quote.shares}, Payout: ${quote.payoutBps / 100}% of stake`);
+
+// ── Step 3: Swap (buy outcome 1) ──────────────────────────────────────────────
+
+const [betEscrow] = anchor.web3.PublicKey.findProgramAddressSync(
+  [Buffer.from("ss_escrow"), platform.publicKey.toBuffer(), user.publicKey.toBuffer(), marketSeed],
+  PAM_PROGRAM_ID
+);
+const [bet] = anchor.web3.PublicKey.findProgramAddressSync(
+  [Buffer.from("ss_bet"), platform.publicKey.toBuffer(), user.publicKey.toBuffer(), marketSeed],
+  PAM_PROGRAM_ID
+);
+
+const slippageBps = Math.floor(Number(quote.payoutBps) * 0.99); // 1% tolerance
+
+await program.methods
+  .swap(id, 1, new anchor.BN(10_000_000), new anchor.BN(slippageBps), false)
+  .accounts({
+    platform: platform.publicKey,
+    operator: OPERATOR,
+    user: user.publicKey,
+    betEscrow,
+    bet,
+    resolution,
+  })
+  .signers([operator, user])
+  .rpc();
+```
