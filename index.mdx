@@ -13,8 +13,6 @@ There are 3 user groups, each with a distinct role in the protocol.
 <AccordionGroup>
   <Accordion title="Operator">
     Operators are authorised signers — typically the platform itself or a trusted backend service. Every bet placement and swap must be co-signed by an operator, giving platforms full control over who can interact with their markets.
-
-    Operators also determine the protocol fee rate applied to each bet. The SoftSol native operator (`cxa3sYKNMk5L8PvDqEzWWLAfd4hr88d6U25W6Yz3FiE`) receives a preferential fee rate; third-party operators are charged the standard rate.
   </Accordion>
   <Accordion title="Platform">
     Platforms are the B2B customers of SoftSol — casino and betting operators building on top of the protocol. A platform wallet owns the active treasury, which holds the collateral required to back all open bet payouts. The platform signs market creation and resolution requests, and is responsible for funding the treasury before bets can be placed.
